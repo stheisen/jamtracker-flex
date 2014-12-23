@@ -2,7 +2,7 @@
 <application xmlns="http://ns.adobe.com/air/application/15.0"> 
 	
 	<id>JamTracker</id> 
-	<versionNumber>0.7.0</versionNumber> 
+	<versionNumber>0.6.1</versionNumber> 
 	<filename>JamTracker</filename> 
 	
 	<name>JamTracker</name> 
