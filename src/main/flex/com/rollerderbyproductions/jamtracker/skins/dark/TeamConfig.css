@@ -1,0 +1,26 @@
+/* CSS file */
+@namespace s "library://ns.adobe.com/flex/spark";
+@namespace mx "library://ns.adobe.com/flex/mx";
+
+.textInput {
+	contentBackgroundColor: #BBB;
+	color: #000;
+}
+
+.rosterGridHeader {
+	fontWeight: bold;
+	textAlign: left;
+	color: #000;
+	font-size: 10;
+}
+
+.rosterGrid {
+	vertical-grid-lines: true;
+	vertical-grid-line-color: #000;
+	horizontal-grid-lines: true;
+	horizontal-grid-line-color: #000;	
+	border-style: solid;
+	border-color: #000;
+	alternating-item-colors: #444444, #343434;
+	font-size: 10;
+}

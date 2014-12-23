@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 xmlns:controls="com.rollerderbyproductions.jamtracker.controls.*"
+		 creationComplete="model.init();">
+
+	<fx:Script>
+		<![CDATA[
+			import com.rollerderbyproductions.jamtracker.model.ApplicationModel;
+			import com.rollerderbyproductions.jamtracker.model.AssetModel;
+			import com.rollerderbyproductions.jamtracker.presentation.input.ScoreboardConfigPresentationModel;
+			import com.rollerderbyproductions.jamtracker.presentation.input.ViewControlPresentationModel;
+			
+			import mx.controls.Alert;
+			import mx.core.Application;
+			
+			[Bindable][Inject] public var model:ScoreboardConfigPresentationModel;
+			[Inject] public var viewControl:ViewControlPresentationModel;
+
+		]]>
+	</fx:Script>
+	
+	<s:VGroup width="100%" height="100%" horizontalAlign="center">
+		
+		<s:BorderContainer styleName="panelContainer" width="100%" >
+			<s:VGroup height="100%" width="100%" verticalAlign="top" paddingBottom="0" paddingLeft="5" paddingTop="5" >
+				<s:Label width="100%" text="Customize Main Scoreboard Display Elements" textAlign="left" styleName="panelContainerTitle" />
+				<mx:Form id="homeForm" width="100%" styleName="formStyle" paddingTop="5">
+					
+					<mx:FormItem label="Background Image:" direction="horizontal">
+						<controls:IconButton label="{model.backgroundImageUploadText}" width="120"
+											 iconUp="{AssetModel.ICON_ADDIMAGE16_CLASS}"
+											 click="model.scoreboardImageUpload(model.IMAGE_BACKGROUND)" 
+											 toolTip="Update Scoreboard Background"
+											 styleName="iconButton" />
+						<controls:IconToggleButton iconUp="{AssetModel.ICON_IMAGEINACTIVE_CLASS}" iconDown="{AssetModel.ICON_IMAGEACTIVE_CLASS}" toolTip="Toggle Background Visibility" styleName="centeredIconToggleButton" selected="{model.scoreboard.backgroundImageVisible}" click="model.toggleBackgroundImage(event)" width="22"/>
+						<mx:Image source="{AssetModel.ICON_WARNING_CLASS}" visible="{model.displayBackgroundImageSizeWarning}" height="100%" verticalAlign="middle"
+								  toolTip="{ApplicationModel.MESSAGE_BACKGROUND_IMAGE_EXCEED_MAX_SIZE}" />
+						<s:Label text="Transparancy:" verticalAlign="middle" height="100%" paddingLeft="15"/>
+						<mx:HSlider minimum="0" maximum="1" tickInterval=".2" liveDragging="true" 
+									change="model.changeBackgroundImageTransparancy(event)" width="70" value="{model.scoreboard.backgroundImageAlpha}" />
+					</mx:FormItem>
+					
+					<mx:FormItem label="Overlay Image:" direction="horizontal">
+						<controls:IconButton label="{model.headerImageUploadText}" width="120"
+											 iconUp="{AssetModel.ICON_ADDIMAGE16_CLASS}"
+											 click="model.scoreboardImageUpload(model.IMAGE_OVERLAY)" 
+											 toolTip="Update Scoreboard Overlay"
+											 styleName="iconButton" />
+						<controls:IconToggleButton iconUp="{AssetModel.ICON_IMAGEINACTIVE_CLASS}" iconDown="{AssetModel.ICON_IMAGEACTIVE_CLASS}" toolTip="Toggle Overlay Visibility" styleName="centeredIconToggleButton" selected="{model.scoreboard.overlayImageVisible}" click="model.toggleHeaderImage(event)" width="22"/>
+						<mx:Image source="{AssetModel.ICON_WARNING_CLASS}" visible="{model.displayOverlayImageSizeWarning}" height="100%" verticalAlign="middle"
+								  toolTip="{ApplicationModel.MESSAGE_OVERLAY_IMAGE_EXCEED_MAX_SIZE}" />
+						<s:Label text="Transparancy:" verticalAlign="middle" height="100%" paddingLeft="15" />
+						<mx:HSlider minimum="0" maximum="1" tickInterval=".2" liveDragging="true" 
+									change="model.changeHeaderImageTransparancy(event)" width="70" value="{model.scoreboard.overlayImageAlpha}" />
+					</mx:FormItem>					
+
+					<mx:FormItem label="Background Color:" direction="horizontal">
+						<mx:ColorPicker selectedColor="@{model.scoreboard.backgroundColor}" />
+						<s:Label text="Intensity:" verticalAlign="middle" height="100%" paddingLeft="15"/>
+						<mx:HSlider minimum="0" maximum="1" tickInterval=".2" liveDragging="true" 
+									change="model.changeBackgroundColorIntensity(event)" width="70" value="{model.scoreboard.backgroundAlpha}" />
+					</mx:FormItem>
+
+					<mx:FormItem label="Label Text:" direction="horizontal">
+						<mx:ColorPicker selectedColor="@{model.scoreboard.fontColor}" />
+						<s:Label text="Intensity:" verticalAlign="middle" height="100%" paddingLeft="15"/>
+						<mx:HSlider minimum="0" maximum="1" tickInterval=".2" liveDragging="true" 
+									change="model.changeFontColorIntensity(event)" width="70" value="{model.scoreboard.fontAlpha}" />
+					</mx:FormItem>
+
+					<mx:FormItem label="Timeout Text:" direction="horizontal">
+						<mx:ColorPicker selectedColor="@{model.scoreboard.timeoutFontColor}" />
+						<s:Label text="Intensity:" verticalAlign="middle" height="100%" paddingLeft="15"/>
+						<mx:HSlider minimum="0" maximum="1" tickInterval=".2" liveDragging="true" 
+									change="model.changeTimeoutColorIntensity(event)" width="70" value="{model.scoreboard.timeoutFontAlpha}" />
+					</mx:FormItem>
+
+					<mx:FormItem label="Clock Label Text:" direction="horizontal">
+						<mx:ColorPicker selectedColor="@{model.scoreboard.clockTitlefontColor}" />
+						<s:Label text="Intensity:" verticalAlign="middle" height="100%" paddingLeft="15"/>
+						<mx:HSlider minimum="0" maximum="1" tickInterval=".2" liveDragging="true" 
+									change="model.changeClockTitleFontColorIntensity(event)" width="70" value="{model.scoreboard.clockTitleFontAlpha}" />
+					</mx:FormItem>
+
+					
+					<mx:FormItem label="Lead Jammer Text:" direction="horizontal">
+						<mx:ColorPicker selectedColor="@{model.scoreboard.LeadJammer_Color}" />
+						<s:Label text="Intensity:" verticalAlign="middle" height="100%" paddingLeft="15"/>
+						<mx:HSlider minimum="0" maximum="1" tickInterval=".2" liveDragging="true" 
+									change="model.changeLeadJammerColorIntensity(event)" width="70" value="{model.scoreboard.LeadJammer_Alpha}" />
+					</mx:FormItem>
+
+					<mx:FormItem label="Scoring Borders:" direction="horizontal">
+						<mx:ColorPicker selectedColor="@{model.scoreboard.containerBorderColor}" />
+						<s:Label text="Intensity:" verticalAlign="middle" height="100%" paddingLeft="15"/>
+						<mx:HSlider minimum="0" maximum="1" tickInterval=".2" liveDragging="true" 
+									change="model.changeContainerBorderColorIntensity(event)" width="70" value="{model.scoreboard.containerBorderAlpha}" />
+					</mx:FormItem>
+
+					<mx:FormItem label="Scoring Text:" direction="horizontal">
+						<mx:ColorPicker selectedColor="@{model.scoreboard.LED_ForeColor}" />
+						<s:HGroup paddingLeft="15">
+							<s:CheckBox selected="@{model.scoreboard.glowEnabled}" click="model.glowEffectClickHandler(event);" />
+							<s:Label text="Enable Scoring Glow Effect" styleName="checkboxLabel" width="100%"/>															
+						</s:HGroup>
+						<s:Label text="Color:" height="100%" width="100%" verticalAlign="middle" visible="{model.scoreboard.glowEnabled}"/>
+						<mx:ColorPicker selectedColor="@{model.scoreboard.LED_GlowColor}" visible="{model.scoreboard.glowEnabled}" change="model.glowEffectColorChangeHandler(event);"/>
+					</mx:FormItem>
+					
+				</mx:Form>
+			</s:VGroup>
+		</s:BorderContainer>
+		
+		<s:BorderContainer styleName="panelContainer" width="100%" height="100%">
+			<s:VGroup height="100%" width="100%" verticalAlign="top" paddingBottom="0" paddingLeft="5" paddingTop="5" >
+				<s:Label width="100%" text="Modify Main Scoreboard Positioning" textAlign="left" styleName="panelContainerTitle" />
+				<mx:Form id="homeForm2" width="100%" styleName="formStyle" paddingTop="5">
+					
+					<mx:FormItem label="Horizontal Position:" direction="horizontal">
+						<mx:HSlider minimum="-1024" maximum="1024" tickInterval="204.8" liveDragging="true" 
+									change="model.changeScoreboardHorizontal(event)" width="375" value="{model.scoreboard.scoreboardX}" />
+					</mx:FormItem>
+					<mx:FormItem label="Vertical Position:" direction="horizontal">
+						<mx:HSlider minimum="-768" maximum="768" tickInterval="153.6" liveDragging="true" 
+									change="model.changeScoreboardVertical(event)" width="375" value="{model.scoreboard.scoreboardY}" />
+					</mx:FormItem>
+					
+					<mx:FormItem label="Scaling:" direction="horizontal">						
+						<mx:HSlider minimum=".5" maximum="1.5" tickInterval=".1" liveDragging="true" 
+									change="if (model != null){ model.changeScoreboardScale(event) }" width="375" value="{model.scoreboard.scoreboardScale}" /> 
+					</mx:FormItem>
+				</mx:Form>
+			</s:VGroup>
+		</s:BorderContainer>
+		
+	</s:VGroup>
+	
+</s:Group>

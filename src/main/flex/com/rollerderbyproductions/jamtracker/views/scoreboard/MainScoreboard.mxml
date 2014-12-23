@@ -1,0 +1,510 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:SkinnableContainer  xmlns:fx="http://ns.adobe.com/mxml/2009"
+	     xmlns:controls="com.rollerderbyproductions.jamtracker.controls.*"
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 backgroundColor="0x000000"
+		 minWidth="1024" minHeight="768"
+		 maxWidth="1024" maxHeight="768"
+		 creationComplete="initView(event)">
+
+	<fx:Style source="com/rollerderbyproductions/jamtracker/skins/dark/Scoreboard.css" />
+
+	<fx:Script>
+		<![CDATA[
+			import com.rollerderbyproductions.jamtracker.domain.JammerDisplay;
+			import com.rollerderbyproductions.jamtracker.model.AssetModel;
+			import com.rollerderbyproductions.jamtracker.model.ScoreboardModel;
+			import com.rollerderbyproductions.jamtracker.model.TeamsModel;
+			import com.rollerderbyproductions.jamtracker.presentation.MainPresentationModel;
+			import com.rollerderbyproductions.jamtracker.presentation.input.ScoreboardControlPresentationModel;
+			import com.rollerderbyproductions.jamtracker.presentation.scoreboard.ScoreboardPresentationModel;
+			
+			import mx.binding.utils.ChangeWatcher;
+			import mx.controls.Alert;
+			import mx.core.ByteArrayAsset;
+			import mx.effects.easing.Elastic;
+			import mx.events.EffectEvent;
+			import mx.events.FlexEvent;
+			import mx.graphics.codec.PNGEncoder;
+			
+			import spark.components.Label;
+			import spark.filters.*;			
+			
+			[Inject][Bindable] public var control:ScoreboardControlPresentationModel;
+			[Inject][Bindable] public var model:ScoreboardPresentationModel;
+
+			private var _gloFilter:GlowFilter;	
+			
+			[Bindable] private var _backgroundImageVisible:Boolean;			
+			[Bindable] private var _headerImageVisible:Boolean;			
+			[Bindable] public var clockLabel:String;
+			
+
+			public function initView(event:Event):void{
+				// Check for the glow enabled setting when the view is initialized
+				model.determineGlowState();
+				// When the window is created, start the necessary effects.
+				if (homeLeadJammerIndicator.visible) startLeadjammerEffect(TeamsModel.HOME_TEAM);
+				if (visitorLeadJammerIndicator.visible) startLeadjammerEffect(TeamsModel.VISITING_TEAM);
+			}			
+			
+			/**
+			 * Initialize the glow filter for all LED numbers
+			 */
+			[EventHandler( event="ScoreboardEvent.GLOW_EFFECT_ON" )]
+			public function enableGlowFilter():void {
+				if ((control != null) && (model != null)){
+					_gloFilter = new GlowFilter(model.scoreboard.LED_GlowColor, model.scoreboard.LED_GlowAlpha, 6, 6, 2, 1, false, false);
+					gameClock_LED.filters = [_gloFilter];
+					homeScore_LED.filters = [_gloFilter];
+					visitorScore_LED.filters = [_gloFilter];
+					homeTimeout_LED.filters = [_gloFilter];
+					periodNumber_LED.filters = [_gloFilter]; 
+					visitorTimeout_LED.filters = [_gloFilter];
+					jamNumber_LED.filters = [_gloFilter];
+					homeJamPoints_LED.filters = [_gloFilter];
+					visitorJamPoints_LED.filters = [_gloFilter];
+					//homePointsPreviousJam_LED.filters = [_gloFilter];
+					//visitorPointsPreviousJam_LED.filters = [_gloFilter];
+					visitorJamsLead_LED.filters = [_gloFilter];
+					homeJamsLead_LED.filters = [_gloFilter];
+					timeoutClock.filters = [_gloFilter];
+					officialTimeoutClock.filters = [_gloFilter];
+					breakClock.filters = [_gloFilter];
+					jamClock.filters = [_gloFilter];
+					intermissionClock.filters = [_gloFilter];
+				}
+			}
+			
+			/**
+			 * Disable the glow filter for all LED numbers
+			 */
+			[EventHandler( event="ScoreboardEvent.GLOW_EFFECT_OFF" )]
+			public function disableGlowFilter():void {		
+				gameClock_LED.filters = null;
+				homeScore_LED.filters = null;
+				visitorScore_LED.filters = null;
+				homeTimeout_LED.filters = null;
+				periodNumber_LED.filters = null; 
+				visitorTimeout_LED.filters = null;
+				jamNumber_LED.filters = null;
+				homeJamPoints_LED.filters = null;
+				visitorJamPoints_LED.filters = null;
+				//homePointsPreviousJam_LED.filters = null;
+				//visitorPointsPreviousJam_LED.filters = null;
+				visitorJamsLead_LED.filters = null;
+				homeJamsLead_LED.filters = null;
+				timeoutClock.filters = null;
+				officialTimeoutClock.filters = null;
+				breakClock.filters = null;
+				jamClock.filters = null;
+				intermissionClock.filters = null;
+			}
+			
+			
+			/**
+			 * Starts the lead jammer effect for the specified team
+			 */
+			public function startLeadjammerEffect(teamSide:String):void {
+				// Set the active team roster to the appropriate team			
+				switch (teamSide){
+					case TeamsModel.HOME_TEAM:
+						homeLeadJammerFlash.play();
+						break;
+					case TeamsModel.VISITING_TEAM:
+						visitorLeadJammerFlash.play();
+						break;
+				}
+			}
+			
+			/**
+			 * Stops the lead jammer effect for the specified team
+			 */
+			public function stopLeadjammerEffect(teamSide:String):void {
+				// Set the active team roster to the appropriate team			
+				switch (teamSide){
+					case TeamsModel.HOME_TEAM:
+						homeLeadJammerFlash.stop();
+						break;
+					case TeamsModel.VISITING_TEAM:
+						visitorLeadJammerFlash.stop();
+						break;
+				}
+			}
+			
+
+			protected function homeLeadJammerFlash_stopHandler(event:EffectEvent):void
+			{
+				callLater(
+					function():void {
+						homeJammerSteady.play();
+					}
+				);			
+			}
+
+
+			protected function visitorLeadJammerFlash_effectStopHandler(event:EffectEvent):void
+			{
+				callLater(
+					function():void {
+						visitorJammerSteady.play();
+					}
+				);
+			}
+
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		<s:Parallel id="homeLeadJammerFlash" effectStop="homeLeadJammerFlash_stopHandler(event)">
+			<s:Fade duration="1000" target="{homeLeadJammerImage}" alphaFrom="1" alphaTo="0" repeatBehavior="reverse" repeatCount="0" repeatDelay="500" />
+			<s:Fade duration="1000" target="{homeLeadJammerIndicator}" alphaFrom="0" alphaTo="1" repeatBehavior="reverse" repeatCount="0" repeatDelay="500"/>
+		</s:Parallel>
+
+		<s:Parallel id="homeJammerSteady">
+			<s:Fade target="{homeLeadJammerImage}" alphaTo="1" repeatCount="1" />
+		</s:Parallel>
+		
+		<s:Parallel id="visitorLeadJammerFlash" effectStop="visitorLeadJammerFlash_effectStopHandler(event)">
+			<s:Fade duration="1000" target="{visitorLeadJammerImage}" alphaFrom="1" alphaTo="0" repeatBehavior="reverse" repeatCount="0" repeatDelay="500"/>
+			<s:Fade duration="1000" target="{visitorLeadJammerIndicator}" alphaFrom="0" alphaTo="1" repeatBehavior="reverse" repeatCount="0" repeatDelay="500"/>
+		</s:Parallel>		
+		<s:Parallel id="visitorJammerSteady">
+			<s:Fade target="{visitorLeadJammerImage}" alphaTo="1" repeatCount="1" />
+		</s:Parallel>		
+	</fx:Declarations>
+	
+	
+	<s:SkinnableContainer  width="100%" height="100%" backgroundColor="{model.scoreboard.backgroundColor}" backgroundAlpha="{model.scoreboard.backgroundAlpha}">
+		<mx:Image id="backgroundImg" source="{model.scoreboard.backgroundImage.data}" width="100%" height="100%" 
+				  maintainAspectRatio="{model.scoreboard.backgroundMaintainAspect}" 
+				  scaleContent="true"
+				  horizontalAlign="center" smoothBitmapContent="true"
+				  alpha="{model.scoreboard.backgroundImageAlpha}"
+				  visible="{model.scoreboard.backgroundImageVisible}"/>
+	</s:SkinnableContainer>
+	
+	<s:Group  width="100%" height="100%">
+		<mx:Image id="overlayImg" source="{model.scoreboard.overlayImage.data}" 
+				  width="100%"
+				  scaleContent="true"  smoothBitmapContent="true"
+				  alpha="{model.scoreboard.overlayImageAlpha}"
+				  visible="{model.scoreboard.overlayImageVisible}"/>
+	</s:Group>
+	
+
+
+	<s:Group height="661" width="1024" x="{model.scoreboard.scoreboardX}" y="{model.scoreboard.scoreboardY}" scaleX="{model.scoreboard.scoreboardScale}" scaleY="{model.scoreboard.scoreboardScale}">
+
+		<!--
+		<mx:Image source="{AssetModel.LOGO_JAMTRACKER_BOARDLABEL_CLASS}" height="70" width="100%" y="260" horizontalAlign="center"/>
+		-->
+		
+		<s:HGroup width="100%" height="100%">
+			<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  THE HOME SIDE OF THE SCOREBOARD ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+			<s:VGroup id="leftArea" width="307" height="100%" horizontalAlign="center" gap="5" paddingTop="10">
+				
+				<s:Label id="label_HomeTeam" text="{control.teamsModel.homeTeam.shortName}" color="{control.teamsModel.homeTeam.scoreBoardNameFontColor}"
+						 width="100%" height="36" fontSize="36" textAlign="center" styleName="boardLabel"/>
+				
+				<mx:Image id="homeLogo" source="{control.teamsModel.homeTeam.logoImage.data}" 
+						  width="216" height="{model.scoreboard.currentTeamLogoHeight}" smoothBitmapContent="true"
+						  scaleContent="true" maintainAspectRatio="true" horizontalAlign="center" verticalAlign="middle"/>
+
+				<s:BorderContainer styleName="borderContainer" borderColor="{model.scoreboard.containerBorderColor}"  borderAlpha="{model.scoreboard.containerBorderAlpha}"							   
+								   height="110" width="216" >
+					<s:Label styleName="largeLED" text="888" color="{model.scoreboard.LED_BackColor}" 
+							 width="100%" height="100%" x="-5" y="-4">
+						<fx:Script>
+							<![CDATA[
+								import flash.utils.flash_proxy;
+							]]>
+						</fx:Script>
+					</s:Label>
+
+					<s:Label styleName="largeLED" id="homeScore_LED" text="{control.scoring.homeTeam.score}" color="{model.scoreboard.LED_ForeColor}"
+							 width="100%" height="100%" x="-5" y="-4"/>
+				</s:BorderContainer>
+				
+				<!-- Jammer Info Area --> 
+				<s:VGroup height="100%" width="100%" horizontalAlign="center" gap="5" visible="{control.scoring.homeTeam.jammerInformationVisible}">
+					<s:Group height="40">
+						<s:Label id="homeJammerLeadLabel" height="100%" visible="{model.scoring.homeTeam.useLeadJammerIndicatorImage}"  
+								 color="{model.scoreboard.LeadJammer_Color}" styleName="leadJammerLabel" alpha="{model.scoreboard.LeadJammer_Alpha}"
+								 text="LEAD JAMMER" fontSize="28"
+								 width="100%" maxDisplayedLines="1" bottom="0" verticalAlign="bottom" textAlign="center" paddingBottom="5"/>
+					</s:Group>
+					
+					<s:Group height="{model.scoreboard.currentJammerImageHeight}">
+						<controls:BorderImage id="homeLeadJammerImage" visible="{model.scoreboard.displayJammerImage}"
+											  source="{model.scoreboard.jammerHome.image.data}"
+											  borderColor="{model.scoreboard.jammerHome.imageBorderColor}" 
+											  borderThickness="{model.scoreboard.jammerHome.imageBorderWeight}" 
+											  borderAlpha="{model.scoreboard.jammerHome.imageBorderAlpha}" 
+											  borderRounded="{model.scoreboard.jammerHome.imageBorderCornerRadius}" smoothBitmapContent="true"
+											  width="200" height="100%" scaleContent="true" maintainAspectRatio="true" horizontalAlign="center" verticalAlign="middle"/>
+						
+						<mx:Image id="homeLeadJammerIndicator"
+								  source="{model.scoreboard.leadJammerIndicatorImage.data}" 
+								  visible="{control.scoring.homeTeam.useLeadJammerIndicatorImage}" smoothBitmapContent="true"
+								  show="startLeadjammerEffect(TeamsModel.HOME_TEAM);" hide="stopLeadjammerEffect(TeamsModel.HOME_TEAM);"
+								  width="200" height="100%" scaleContent="true" maintainAspectRatio="true" 
+								  horizontalAlign="center" verticalAlign="middle" />
+					</s:Group>
+					<s:Group height="40">
+						<s:Label id="homeJammerName" height="100%" visible="{model.scoreboard.displayJammerName}" 
+								 color="{model.scoreboard.fontColor}" alpha="{model.scoreboard.fontAlpha}"
+								 text="{control.scoring.homeTeam.currentJammer.derbyName}" fontSize="{model.scoreboard.jammerNameFontSize}"
+								 width="100%" styleName="jammerName" maxDisplayedLines="1" bottom="0" verticalAlign="top" textAlign="center" paddingTop="5"/>
+					</s:Group>
+				</s:VGroup>				
+				
+				
+			</s:VGroup>
+			<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  THE CENTER OF THE SCOREBOARD ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->	
+			<s:VGroup id="centerArea" width="410" height="100%" gap="22" horizontalAlign="center">
+				
+				<!-- TIMEOUT counter -->
+				<s:HGroup id="timeoutCounter" verticalAlign="middle">
+					<s:BorderContainer borderColor="{model.scoreboard.containerBorderColor}"  borderAlpha="{model.scoreboard.containerBorderAlpha}" backgroundColor="#2d2d2d"
+									   styleName="borderContainer" height="54" width="42" >
+						<s:Label id="homeTimeout_LED_bg" text="8" color="{model.scoreboard.LED_BackColor}"
+								 styleName="mediumLED" width="100%" height="100%" x="-4" y="-1"/>
+						<s:Label id="homeTimeout_LED"  text="{control.scoring.homeTeam.timeoutsLeft}" color="{model.scoreboard.LED_ForeColor}"
+								 styleName="mediumLED" width="100%" height="100%" x="-4" y="-1"/>
+					</s:BorderContainer>	
+					
+					<s:Label styleName="boardLabel" text="TIMEOUTS" color="{model.scoreboard.fontColor}" alpha="{model.scoreboard.fontAlpha}" 
+							 fontSize="40" width="260" height="100%" paddingTop="9" verticalAlign="middle" textAlign="center" />
+					
+					<s:BorderContainer borderColor="{model.scoreboard.containerBorderColor}"  borderAlpha="{model.scoreboard.containerBorderAlpha}" backgroundColor="#2d2d2d" 
+									   styleName="borderContainer" height="54" width="42">
+						<s:Label id="visitorTimeout_LED_bg" text="8" color="{model.scoreboard.LED_BackColor}"
+								 styleName="mediumLED" width="100%" height="100%" x="-4" y="-1"/>
+						<s:Label id="visitorTimeout_LED" text="{control.scoring.visitorTeam.timeoutsLeft}" color="{model.scoreboard.LED_ForeColor}"
+								 styleName="mediumLED" width="100%" height="100%" x="-4" y="-1"/>
+					</s:BorderContainer>			
+				</s:HGroup>
+				
+				
+				<!-- Game Clock -->
+				<s:HGroup id="gameClock" horizontalAlign="center">
+					<s:BorderContainer styleName="borderContainer" borderColor="{model.scoreboard.containerBorderColor}"  borderAlpha="{model.scoreboard.containerBorderAlpha}" 
+									   height="113" width="360"  >
+						<s:Label styleName="clockLED" text="{control.scoring.gameClock.displayFormat}" color="{model.scoreboard.LED_BackColor}"
+								 width="100%" height="76" y="7" textAlign="center"/>
+						<s:Label styleName="clockLED" id="gameClock_LED" text="{control.scoring.gameClock.formattedTimeRemaining}" color="{model.scoreboard.LED_ForeColor}"
+								 width="100%" height="76" y="7" textAlign="center"/>
+					</s:BorderContainer> 
+				</s:HGroup>
+
+				
+				<!-- PERIOD and JAM counter -->
+				<s:HGroup id="periodAndJam" verticalAlign="middle" gap="0">
+					<s:Label styleName="boardLabel" text="PERIOD" color="{model.scoreboard.fontColor}" alpha="{model.scoreboard.fontAlpha}" 
+							 fontSize="40" height="100%" paddingTop="9" verticalAlign="middle"  paddingRight="10"/>	
+					<s:BorderContainer borderColor="{model.scoreboard.containerBorderColor}"  borderAlpha="{model.scoreboard.containerBorderAlpha}" backgroundColor="#2d2d2d"
+									   styleName="borderContainer" height="54" width="43">
+						<s:Label id="periodNumber_LED_bg" text="8" color="#212121" 
+								 styleName="mediumLED" width="100%" height="100%" x="-4" y="-1"/>
+						<s:Label id="periodNumber_LED"  text="{control.scoring.currentPeriodNumber}" color="{model.scoreboard.LED_ForeColor}"
+								 styleName="mediumLED" width="100%" height="100%" x="-4" y="-1"/>
+					</s:BorderContainer>
+					
+					<s:Label styleName="boardLabel" text="JAM" color="{model.scoreboard.fontColor}" alpha="{model.scoreboard.fontAlpha}" 
+							 fontSize="40" height="100%" paddingTop="9" verticalAlign="middle" paddingLeft="25" paddingRight="10"/>	
+					<s:BorderContainer borderColor="{model.scoreboard.containerBorderColor}" borderAlpha="{model.scoreboard.containerBorderAlpha}" backgroundColor="#2d2d2d"
+									   styleName="borderContainer" height="54" width="71">
+						<s:Label id="jamNumber_LED_bg" text="88" color="#212121" 
+								 styleName="mediumLED" width="100%" height="100%" x="-4" y="-1"/>
+						<s:Label id="jamNumber_LED" text="{control.scoring.currentJamNumber}" color="{model.scoreboard.LED_ForeColor}"
+								 styleName="mediumLED" width="100%" height="100%" x="-4" y="-1"/>
+					</s:BorderContainer>			
+				</s:HGroup>
+				
+
+				<!-- MESSAGE Area -->
+				<s:Group id="messageArea" height="35">
+										
+					<s:Label styleName="boardLabelBold" text="OFFICIAL'S TIMEOUT" color="{model.scoreboard.timeoutFontColor}" visible="{model.scoring.officialTimeout}" alpha="{model.scoreboard.timeoutFontAlpha}"
+							 fontSize="34" height="100%" width="100%" verticalAlign="middle" textAlign="center" />
+					
+					<s:Label styleName="boardLabelBold" text="TIMEOUT" color="{model.scoreboard.timeoutFontColor}" visible="{model.scoring.homeTeam.timeout}" alpha="{model.scoreboard.timeoutFontAlpha}"
+							 fontSize="34" height="100%" width="100%" verticalAlign="middle" textAlign="center"/>
+					<s:Label styleName="boardLabelBold" text="◄" color="{model.scoreboard.timeoutFontColor}" visible="{model.scoring.homeTeam.timeout}" alpha="{model.scoreboard.timeoutFontAlpha}"
+							 fontSize="34" height="100%" width="100%" verticalAlign="middle" textAlign="left" paddingLeft="40"/>
+					
+					<s:Label styleName="boardLabelBold" text="TIMEOUT" color="{model.scoreboard.timeoutFontColor}" visible="{model.scoring.visitorTeam.timeout}" alpha="{model.scoreboard.timeoutFontAlpha}"
+							 fontSize="34" height="100%" width="100%" verticalAlign="middle" textAlign="center"/>
+					<s:Label styleName="boardLabelBold" text="►" color="{model.scoreboard.timeoutFontColor}" visible="{model.scoring.visitorTeam.timeout}" alpha="{model.scoreboard.timeoutFontAlpha}"
+							 fontSize="34" height="100%" width="100%" verticalAlign="middle" textAlign="right" paddingRight="40" />
+				</s:Group>
+
+				<!-- JAM POINTS -->
+				<s:HGroup id="jamPoints" verticalAlign="middle" height="54">
+					
+					<s:BorderContainer borderColor="{model.scoreboard.containerBorderColor}"  borderAlpha="{model.scoreboard.containerBorderAlpha}" backgroundColor="#2d2d2d"
+									   styleName="borderContainer" height="54" width="71" >
+						<s:Label id="homeJamPoints_bg" text="88" color="{model.scoreboard.LED_BackColor}"
+								 styleName="mediumLED" width="100%" height="100%" x="-4" y="-1"/>
+						<s:Label id="homeJamPoints_LED"  text="{control.scoring.homeTeam.pointsThisJam}" color="{model.scoreboard.LED_ForeColor}"
+								 styleName="mediumLED" width="100%" height="100%" x="-4" y="-1"/>
+					</s:BorderContainer>
+					
+					<s:Label styleName="boardLabel" text="JAM POINTS" color="{model.scoreboard.fontColor}" alpha="{model.scoreboard.fontAlpha}" 
+							 fontSize="38" width="240" height="100%" paddingTop="10" verticalAlign="middle" textAlign="center"/>
+					
+					<s:BorderContainer borderColor="{model.scoreboard.containerBorderColor}"  borderAlpha="{model.scoreboard.containerBorderAlpha}" backgroundColor="#2d2d2d"
+									   styleName="borderContainer" height="54" width="71" >
+						<s:Label id="visitorJamPoints_LED_bg" text="88" color="{model.scoreboard.LED_BackColor}"
+								 styleName="mediumLED" width="100%" height="100%" x="-4" y="-1"/>
+						<s:Label id="visitorJamPoints_LED"  text="{control.scoring.visitorTeam.pointsThisJam}" color="{model.scoreboard.LED_ForeColor}"
+								 styleName="mediumLED" width="100%" height="100%" x="-4" y="-1"/>
+					</s:BorderContainer>			
+				</s:HGroup>
+				
+				<!-- Secondary Clock -->
+				<s:Group id="secondaryClock">
+					<s:BorderContainer borderColor="{model.scoreboard.containerBorderColor}"  borderAlpha="{model.scoreboard.containerBorderAlpha}" backgroundColor="#2d2d2d"
+									   styleName="borderContainer" height="113" width="362" y="25" >
+						<!-- Jam Clock -->
+						<s:Label id="jamClockBackground" styleName="clockLED" text="{control.scoring.jamClock.displayFormat}" color="{model.scoreboard.LED_BackColor}"
+								 width="100%" height="76" y="9" textAlign="center" visible="{control.scoring.jamClock.isVisible}"/>
+						<s:Label id="jamClock" styleName="clockLED" text="{control.scoring.jamClock.formattedTimeRemaining}" color="{model.scoreboard.LED_ForeColor}"
+								 width="100%" height="76" y="9" textAlign="center" visible="{control.scoring.jamClock.isVisible}"/>
+						<!-- Break Clock -->					
+						<s:Label id="breakClockBackground" styleName="clockLED" text="{control.scoring.breakClock.displayFormat}" color="{model.scoreboard.LED_BackColor}"
+								 width="100%" height="76" y="9" textAlign="center" visible="{control.scoring.breakClock.isVisible}"/>
+						<s:Label id="breakClock" styleName="clockLED" text="{control.scoring.breakClock.formattedTimeRemaining}" color="{model.scoreboard.LED_ForeColor}"
+								 width="100%" height="76" y="9" textAlign="center" visible="{control.scoring.breakClock.isVisible}"/>
+						<!-- Timeout Clock -->
+						<s:Label id="timeoutClockBackground" styleName="clockLED" text="{control.scoring.timeoutClock.displayFormat}" color="{model.scoreboard.LED_BackColor}"
+								 width="100%" height="76" y="9" textAlign="center" visible="{control.scoring.timeoutClock.isVisible}"/>
+						<s:Label id="timeoutClock" styleName="clockLED" text="{control.scoring.timeoutClock.formattedTimeRemaining}" color="{model.scoreboard.LED_ForeColor}"
+								 width="100%" height="76" y="9" textAlign="center" visible="{control.scoring.timeoutClock.isVisible}"/>
+						<!-- OFFICIAL Timeout Clock -->
+						<s:Label id="officialTimeoutClockBackground" styleName="clockLED" text="{control.scoring.officialTimeoutClock.displayFormat}" color="{model.scoreboard.LED_BackColor}"
+								 width="100%" height="76" y="9" textAlign="center" visible="{control.scoring.officialTimeoutClock.isVisible}"/>
+						<s:Label id="officialTimeoutClock" styleName="clockLED" text="{control.scoring.officialTimeoutClock.formattedTimeRemaining}" color="{model.scoreboard.LED_ForeColor}"
+								 width="100%" height="76" y="9" textAlign="center" visible="{control.scoring.officialTimeoutClock.isVisible}"/>
+						<!-- Intermission Clock -->
+						<s:Label id="intermissionClockBackground" styleName="clockLED" text="{control.scoring.intermissionClock.displayFormat}" color="{model.scoreboard.LED_BackColor}"
+								 width="100%" height="76" y="9" textAlign="center" visible="{control.scoring.intermissionClock.isVisible}"/>
+						<s:Label id="intermissionClock" styleName="clockLED" text="{control.scoring.intermissionClock.formattedTimeRemaining}" color="{model.scoreboard.LED_ForeColor}"
+								 width="100%" height="76" y="9" textAlign="center" visible="{control.scoring.intermissionClock.isVisible}"/>
+					</s:BorderContainer>
+					<s:HGroup horizontalAlign="center" width="100%" height="30" y="-5" >
+						<s:BorderContainer borderColor="{model.scoreboard.containerBorderColor}"  borderAlpha="{model.scoreboard.containerBorderAlpha}" backgroundColor="#2d2d2d"
+										   styleName="borderContainer" width="250" height="40" >
+							<s:Label styleName="clockTitle" text="{control.currentClockLabel}" color="{model.scoreboard.clockTitlefontColor}" alpha="{model.scoreboard.clockTitleFontAlpha}" 
+									 width="100%" height="100%" fontSize="25" verticalAlign="middle" textAlign="center" x="0" y="4"/>
+						</s:BorderContainer>						
+					</s:HGroup>
+				</s:Group>
+				
+				<!-- JAMS LEAD -->
+				<s:Group>
+					<s:HGroup id="jamsLeadGroup">
+						<s:BorderContainer borderColor="{model.scoreboard.containerBorderColor}"  borderAlpha="{model.scoreboard.containerBorderAlpha}" backgroundColor="#2d2d2d"
+										   styleName="borderContainer" height="54" width="71" >
+							<s:Label id="homeJamsLead_LED_bg" text="8" color="{model.scoreboard.LED_BackColor}"
+									 styleName="mediumLED" width="100%" height="100%" x="-4" y="-1"/>
+							<s:Label id="homeJamsLead_LED"  text="{control.scoring.homeTeam.jamsLead}" color="{model.scoreboard.LED_ForeColor}"
+									 styleName="mediumLED" width="100%" height="100%" x="-4" y="-1"/>
+						</s:BorderContainer>
+						
+						<s:Label styleName="boardLabel" text="JAMS LEAD" color="{model.scoreboard.fontColor}" alpha="{model.scoreboard.fontAlpha}" 
+								 fontSize="38" width="240" height="100%" paddingTop="10" verticalAlign="middle" textAlign="center"/>
+						
+						<s:BorderContainer borderColor="{model.scoreboard.containerBorderColor}"  borderAlpha="{model.scoreboard.containerBorderAlpha}" backgroundColor="#2d2d2d"
+										   styleName="borderContainer" height="54" width="71" >
+							<s:Label id="visitorJamsLead_LED_bg" text="8" color="{model.scoreboard.LED_BackColor}"
+									 styleName="mediumLED" width="100%" height="100%" x="-4" y="-1"/>
+							<s:Label id="visitorJamsLead_LED"  text="{control.scoring.visitorTeam.jamsLead}" color="{model.scoreboard.LED_ForeColor}"
+									 styleName="mediumLED" width="100%" height="100%" x="-4" y="-1"/>
+						</s:BorderContainer>
+					</s:HGroup>
+					
+					<!--
+					<s:HGroup id="prevJamGroup">				
+						<s:BorderContainer borderColor="{model.scoreboard.containerBorderColor}"  borderAlpha="{model.scoreboard.containerBorderAlpha}" backgroundColor="#2d2d2d"
+										   styleName="borderContainer" height="54" width="71" >
+							<s:Label id="homePointsPreviousJam_LED_bg" text="88" color="{model.scoreboard.LED_BackColor}"
+									 styleName="mediumLED" width="100%" height="100%" x="-4" y="-1"/>
+							<s:Label id="homePointsPreviousJam_LED"  text="{control.scoring.homeTeam.pointsPreviousJam}" color="{model.scoreboard.LED_ForeColor}"
+									 styleName="mediumLED" width="100%" height="100%" x="-4" y="-1"/>
+						</s:BorderContainer>
+						
+						<s:Label styleName="boardLabel" text="PREV JAM" color="{model.scoreboard.fontColor}" alpha="{model.scoreboard.fontAlpha}" 
+								 fontSize="38" width="240" height="100%" paddingTop="10" verticalAlign="middle" textAlign="center"/>
+						
+						<s:BorderContainer borderColor="{model.scoreboard.containerBorderColor}"  borderAlpha="{model.scoreboard.containerBorderAlpha}" backgroundColor="#2d2d2d"
+										   styleName="borderContainer" height="54" width="71" >
+							<s:Label id="visitorPointsPreviousJam_LED_bg" text="88" color="{model.scoreboard.LED_BackColor}"
+									 styleName="mediumLED" width="100%" height="100%" x="-4" y="-1"/>
+							<s:Label id="visitorPointsPreviousJam_LED"  text="{control.scoring.visitorTeam.pointsPreviousJam}" color="{model.scoreboard.LED_ForeColor}"
+									 styleName="mediumLED" width="100%" height="100%" x="-4" y="-1"/>
+						</s:BorderContainer>	
+					</s:HGroup>
+					-->
+				</s:Group>
+				
+			</s:VGroup>
+			<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  THE VISITOR SIDE OF THE SCOREBOARD ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+			<s:VGroup id="rightArea" width="307" height="100%" horizontalAlign="center" gap="5" paddingTop="10">
+				
+				<s:Label id="label_VisitingTeam" text="{control.teamsModel.visitorTeam.shortName}" color="{control.teamsModel.visitorTeam.scoreBoardNameFontColor}"
+						 width="100%" height="36" fontSize="36" textAlign="center" styleName="boardLabel" />
+				
+				<mx:Image id="visitorLogo" source="{control.teamsModel.visitorTeam.logoImage.data}" 
+						  width="216" height="{model.scoreboard.currentTeamLogoHeight}" smoothBitmapContent="true"
+						  scaleContent="true" maintainAspectRatio="true" horizontalAlign="center" verticalAlign="middle"/>
+
+				<s:BorderContainer styleName="borderContainer" borderColor="{model.scoreboard.containerBorderColor}"  borderAlpha="{model.scoreboard.containerBorderAlpha}"
+								   height="110" width="216" x="48" >
+					<s:Label styleName="largeLED" text="888" color="{model.scoreboard.LED_BackColor}" 
+							 width="100%" height="100%" x="-5" y="-4"/>
+					<s:Label styleName="largeLED" id="visitorScore_LED" text="{control.scoring.visitorTeam.score}" color="{model.scoreboard.LED_ForeColor}"
+							 width="100%" height="100%" x="-5" y="-4"/>				
+				</s:BorderContainer>
+
+				<!-- Jammer Info Area --> 
+				<s:VGroup height="100%" width="100%" horizontalAlign="center" gap="5" visible="{control.scoring.visitorTeam.jammerInformationVisible}">
+					<s:Group height="40">
+						<s:Label id="visitorJammerLeadLabel" height="100%" visible="{model.scoring.visitorTeam.useLeadJammerIndicatorImage}"  
+								 color="{model.scoreboard.LeadJammer_Color}" styleName="leadJammerLabel"
+								 text="LEAD JAMMER" fontSize="28" alpha="{model.scoreboard.LeadJammer_Alpha}"
+								 width="100%" maxDisplayedLines="1" bottom="0" verticalAlign="bottom" textAlign="center" paddingBottom="5"/>
+					</s:Group>
+					
+					<s:Group height="{model.scoreboard.currentJammerImageHeight}">
+						<controls:BorderImage id="visitorLeadJammerImage" visible="{model.scoreboard.displayJammerImage}"
+											  source="{model.scoreboard.jammerVisitor.image.data}"
+											  borderColor="{model.scoreboard.jammerVisitor.imageBorderColor}" 
+											  borderThickness="{model.scoreboard.jammerVisitor.imageBorderWeight}" 
+											  borderAlpha="{model.scoreboard.jammerVisitor.imageBorderAlpha}" 
+											  borderRounded="{model.scoreboard.jammerVisitor.imageBorderCornerRadius}" smoothBitmapContent="true"
+											  width="200" height="100%" scaleContent="true" maintainAspectRatio="true" horizontalAlign="center" verticalAlign="middle"/>
+						
+						<mx:Image id="visitorLeadJammerIndicator"
+								  source="{model.scoreboard.leadJammerIndicatorImage.data}" 
+								  visible="{control.scoring.visitorTeam.useLeadJammerIndicatorImage}" smoothBitmapContent="true"
+								  show="startLeadjammerEffect(TeamsModel.VISITING_TEAM);" hide="stopLeadjammerEffect(TeamsModel.VISITING_TEAM);"
+								  width="200" height="100%" scaleContent="true" maintainAspectRatio="true"
+								  horizontalAlign="center" verticalAlign="middle" />
+					</s:Group>
+					<s:Group height="40">
+						<s:Label id="visitorJammerName" height="100%" visible="{model.scoreboard.displayJammerName}" 
+								 color="{model.scoreboard.fontColor}" alpha="{model.scoreboard.fontAlpha}"
+								 text="{control.scoring.visitorTeam.currentJammer.derbyName}" fontSize="{model.scoreboard.jammerNameFontSize}"
+								 width="100%" styleName="jammerName" maxDisplayedLines="1" bottom="0" verticalAlign="top" textAlign="center" paddingTop="5"/>
+					</s:Group>
+				</s:VGroup>
+
+			</s:VGroup>
+		</s:HGroup>
+	</s:Group>
+	
+	
+	</s:SkinnableContainer >

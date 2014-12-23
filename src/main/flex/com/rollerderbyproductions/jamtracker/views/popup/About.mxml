@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:controls="com.rollerderbyproductions.jamtracker.controls.*"
+			   width="550" 
+			   height="380"
+			   title="Thank You for choosing JamTracker"
+			   backgroundColor="0x222222"
+			   close="cancel();"
+			   creationComplete="model.initView();"
+			   initialize="configLinks()">
+
+	<fx:Script>
+		<![CDATA[
+			import com.rollerderbyproductions.jamtracker.model.ApplicationModel;
+			import com.rollerderbyproductions.jamtracker.model.AssetModel;
+			import com.rollerderbyproductions.jamtracker.model.SettingsModel;
+			import com.rollerderbyproductions.jamtracker.presentation.popup.AboutPresentationModel;
+			import com.rollerderbyproductions.jamtracker.presentation.popup.RosterEditPresentationModel;
+			
+			import flashx.textLayout.formats.TextDecoration;
+			import flashx.textLayout.formats.TextLayoutFormat;
+			
+			import mx.events.ListEvent;
+			import mx.utils.ObjectUtil;
+		
+			[Bindable][Inject] public var model:AboutPresentationModel;
+			[Bindable][Inject] public var applicationModel:ApplicationModel;		
+
+
+			// Bind this image directly on the splash screen since ths Assett Model is not yet initialized
+			[Bindable] [Embed(source="/assets/logo/jamtracker_logo_350x128.png",mimeType="image/png")]
+			public var LOGO_JAMTRACKER_CLASS:Class;	
+			
+			[Bindable] [Embed(source="/assets/logo/paypalDonate.png",mimeType="image/png")]
+			public var LOGO_PAYPALDONATE_CLASS:Class;
+			
+			[Bindable] public var copyright:String="\u00A9";
+			[Bindable] public var payPalURL:URLRequest= new URLRequest("https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=6GGB6LCXWBK9N");
+			
+			/**
+			 * Handles the close form event
+			 */
+			protected function cancel():void {
+				model.closeWindow();
+			}
+			
+			private function configLinks():void {
+				var normalTLF:TextLayoutFormat = new TextLayoutFormat();
+				normalTLF.color = 0x96d642;
+				
+				var hoverTLF:TextLayoutFormat = new TextLayoutFormat();
+				hoverTLF.color = 0x96d642;
+				hoverTLF.textDecoration = TextDecoration.NONE;
+				
+				var activeTLF:TextLayoutFormat = new TextLayoutFormat();
+				activeTLF.color = 0x96d642;
+				
+				link1.linkNormalFormat = normalTLF;
+				link1.linkHoverFormat = hoverTLF;
+				link1.linkActiveFormat = activeTLF;
+				link2.linkNormalFormat = normalTLF;
+				link2.linkHoverFormat = hoverTLF;
+				link2.linkActiveFormat = activeTLF;
+				link3.linkNormalFormat = normalTLF;
+				link3.linkHoverFormat = hoverTLF;
+				link3.linkActiveFormat = activeTLF;
+				link4.linkNormalFormat = normalTLF;
+				link4.linkHoverFormat = hoverTLF;
+				link4.linkActiveFormat = activeTLF;
+				link5.linkNormalFormat = normalTLF;
+				link5.linkHoverFormat = hoverTLF;
+				link5.linkActiveFormat = activeTLF;
+			}
+
+
+		]]>
+	</fx:Script>
+
+	
+	<s:VGroup width="100%" height="100%" paddingLeft="15" paddingRight="15" paddingTop="5" paddingBottom="5" horizontalAlign="right">
+		
+		<s:HGroup width="100%" height="90">
+			<mx:Image source="{LOGO_JAMTRACKER_CLASS}" height="86" verticalAlign="middle" width="50%" horizontalAlign="left" scaleContent="true" smoothBitmapContent="true"/>			
+			<mx:Image source="{LOGO_PAYPALDONATE_CLASS}" width="50%" horizontalAlign="right" scaleContent="true" smoothBitmapContent="true" click="navigateToURL(payPalURL,'_mine')"/>			
+		</s:HGroup>
+
+		<s:VGroup width="100%" height="100%" verticalAlign="top" horizontalAlign="center">
+			<s:BorderContainer styleName="popupContainer" width="100%" height="100%">
+				<s:VGroup width="100%" paddingLeft="5" paddingRight="5" paddingTop="5" verticalAlign="top" horizontalAlign="center" gap="0">
+					
+					<s:VGroup width="100%" paddingBottom="10" horizontalAlign="center">
+						<s:Label text="JamTracker v{applicationModel.versionNumber}" styleName="largeNBold" />
+						<s:Label text="Premiere Roller Derby Scoring System" />						
+					</s:VGroup>
+
+					<s:TextArea width="100%" height="200" editable="false" styleName="messageTextArea" textIndent="0" whiteSpaceCollapse="collapse" textAlign="justify">
+						<s:content>Please visit <s:a id="link1" href="http://www.rollerderbyproductions.com" target="_blank">RollerDerbyProductions.com</s:a>
+							often to remain up-to-date with the latest JamTracker news.It is Roller Derby Production's goal to make JamTracker the world's premier computer based Roller Derby Scoring solution.
+							However, we do not expect to achieve this without the important feedback of you and our users.
+							Please send your comments and suggestions to <s:a id="link2" href="mailto:jamtracker@rollerderbyproductions.com">jamtracker@rollerderbyproductions.com</s:a>.
+							If you prefer, you may also review current and open new issues directly using our JIRA system by <s:a id="link3" href="http://jira.cybertie.net/jira/secure/BrowseProject.jspa#selectedTab=com.atlassian.jira.plugin.system.project%3Aissues-panel" target="_blank">clicking here</s:a>. 
+							Thank you for your interest in JamTracker, and we look forward to hearing from you!
+							
+							<s:p textIndent="0"/>Special thanks to <s:a id="link4" href="http://neorollerderby.com" target="_blank">NEO Roller Derby</s:a>, Rosa Mariposa, Captain Celt-Lick, Kill C. Grammar, Iconoclast and Percy Q-Tion.
+							
+							<s:p textIndent="0"/>JamTracker is written and maintained by <s:a id="link5" href="http://www.linkedin.com/in/steventheisen" target="_blank">Steven Theisen</s:a>							
+							and is Copyrighted {copyright}2010-2012 by Roller Derby Productions. All Rights Reserved. 
+						</s:content>
+					</s:TextArea>
+
+				</s:VGroup>
+
+			</s:BorderContainer>			
+		</s:VGroup>
+
+		
+		<s:HGroup width="100%" >
+			<s:HGroup width="100%" horizontalAlign="right">
+				<controls:IconButton label="Close" width="76"
+									 iconUp="{AssetModel.ICON_CANCEL16_CLASS}"
+									 click="cancel()" 
+									 styleName="iconButton" />
+			</s:HGroup>
+		</s:HGroup>
+		
+	</s:VGroup>
+	
+</s:TitleWindow>

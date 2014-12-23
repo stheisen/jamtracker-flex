@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:controls="com.rollerderbyproductions.jamtracker.controls.*"
+		 creationComplete="sortDataGrid();">
+
+	<fx:Style source="com/rollerderbyproductions/jamtracker/skins/dark/TeamConfig.css" />
+
+	<fx:Script>
+		<![CDATA[
+			import com.rollerderbyproductions.jamtracker.domain.Player;
+			import com.rollerderbyproductions.jamtracker.domain.Team;
+			import com.rollerderbyproductions.jamtracker.model.ApplicationModel;
+			import com.rollerderbyproductions.jamtracker.model.AssetModel;
+			import com.rollerderbyproductions.jamtracker.presentation.MainPresentationModel;
+			import com.rollerderbyproductions.jamtracker.presentation.input.ScoreboardConfigPresentationModel;
+			import com.rollerderbyproductions.jamtracker.presentation.input.SettingsConfigPresentationModel;
+			import com.rollerderbyproductions.jamtracker.presentation.input.TeamConfigPresentationModel;
+			
+			import mx.controls.Alert;
+			import mx.events.DataGridEvent;
+			import mx.events.ListEvent;
+			import mx.utils.StringUtil;
+
+			[Inject] [Bindable] public var model:TeamConfigPresentationModel;
+			[Inject] [Bindable] public var controller:SettingsConfigPresentationModel;
+			[Bindable] public var configTeam:Team;
+						
+			public var teamSide:String;
+			private var _sortColumnIndex:Number = 3;
+			
+			/**
+			 * Called to set the alpha setting of the controller team background color
+			 */
+			protected function controllerBackgroundAlphaChange(event:Event):void
+			{
+				var currentSlider:HSlider = HSlider(event.currentTarget);
+				configTeam.controllerBackgroundAlpha = currentSlider.value;
+			}
+			
+			/**
+			 * Called when the user clicks on a player in the active roster
+			 */
+			protected function teamActiveRoster_itemClickHandler(event:ListEvent):void
+			{
+				// Set the selected player and make a copy of this player for editing
+				var playerSelected:Player = event.currentTarget.selectedItem as Player;
+				model.activeRoster_clickHandler(teamSide, playerSelected);
+			}
+			
+			/**
+			 * Sets the dataGrid to the default sort
+			 **/
+			[EventHandler( event="BoutStatsEvent.SORT_BY_JAMAPPEARENCE" )]
+			public function sortDataGrid():void {
+				teamRoster.dispatchEvent(new DataGridEvent(DataGridEvent.HEADER_RELEASE, false, true, _sortColumnIndex, null, 0, null, null, 0));
+			}
+
+			
+			/**
+			 * When this object is created set the team to be configured based on the 
+			 * teamSide argument passed in. Also handle the event where the team models
+			 * are reloaded
+			 */
+			[PostConstruct]
+			[EventHandler( event="ControllerEvent.RESET_TEAMMODELS" )]
+			public function afterSwizInjection():void{
+				configTeam = model.setTeam(teamSide);
+			}
+			
+			private function toggleViewState():void {
+				if (currentState == 'minimized') currentState = 'teamDetails' else currentState = 'minimized';
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<s:VGroup width="100%" horizontalAlign="center">
+		<s:BorderContainer styleName="panelContainer" width="100%" height="100%">
+			<s:VGroup height="100%" width="100%" verticalAlign="top">
+				<mx:Form id="teamForm" width="100%" styleName="formStyle" horizontalGap="5" indicatorGap="5">
+					<mx:FormItem label="Name:" direction="horizontal">
+						<s:TextInput id="teamName" text="@{configTeam.shortName}" styleName="textInput" 
+									 width="120" maxChars="15" 
+									 focusIn="{controller.suspendKeyboardShortcuts()}" 
+									 focusOut="{controller.resumeKeyboardShortcuts(); 
+									 configTeam.shortName = StringUtil.trim(configTeam.shortName)}" />
+						<mx:ColorPicker selectedColor="@{configTeam.scoreBoardNameFontColor}"/>
+						<controls:IconButton iconUp="{AssetModel.ICON_CORRECTIONS_CLASS}" 
+											 toolTip="Edit {teamName.text} Team Roster" styleName="centeredIconButton" width="22"
+											 click="model.editRoster(teamSide)"/> 
+					</mx:FormItem>
+					<mx:FormItem label="Logo:" direction="horizontal">						
+						<controls:IconButton label="{model.teamLogoUploadText}" width="120"
+											 iconUp="{AssetModel.ICON_ADDIMAGE16_CLASS}"
+											 click="model.logoUpload(teamSide)" 
+											 toolTip="Update {teamName.text} team logo"
+											 styleName="iconButton" />
+						<mx:Image source="{AssetModel.ICON_WARNING_CLASS}" visible="{configTeam.displayImageSizeWarning}" height="100%" verticalAlign="middle"
+								  toolTip="{ApplicationModel.MESSAGE_TEAMLOGO_IMAGE_EXCEED_MAX_SIZE}" />
+					</mx:FormItem>
+					<mx:FormItem label="Color:" direction="horizontal">
+						<mx:ColorPicker selectedColor="@{configTeam.controllerBackgroundColor}"/>
+						<s:Label text="Intensity:" verticalAlign="middle" height="100%" />
+						<mx:HSlider minimum="0" maximum="1" tickInterval=".2" liveDragging="true" 
+									change="controllerBackgroundAlphaChange(event)" width="70" value="{configTeam.controllerBackgroundAlpha}" />
+					</mx:FormItem>							
+				</mx:Form>
+			</s:VGroup>
+		</s:BorderContainer>
+		
+		<mx:HRule strokeWidth="2" strokeColor="0x222222" shadowColor="0x515151" width="100%" />
+
+		<mx:DataGrid id="teamRoster" dataProvider="{configTeam.activeTeamRoster}" width="100%" 
+					 headerStyleName="rosterGridHeader" styleName="rosterGrid" rowCount="14" rowHeight="20"
+					 sortArrowSkin="mx.skins.spark.DataGridSortArrow" 
+					 itemClick="teamActiveRoster_itemClickHandler(event)"> 
+			<mx:columns>
+				<!-- The image displayed by the headerRenderer is determined by the headerText, which is NOT displayed in the application -->
+				<mx:DataGridColumn headerText="ActiveJammer" dataField="currentJammer" width="20" resizable="false" sortable="false" 
+								   headerRenderer="com.rollerderbyproductions.jamtracker.views.itemRenderer.ImageHeaderRenderer"
+								   itemRenderer="com.rollerderbyproductions.jamtracker.views.itemRenderer.RosterGridActiveJammerIndicatorItemRenderer"/>
+				<mx:DataGridColumn headerText="No." dataField="number" width="45" resizable="true" sortable="false"/>
+				<mx:DataGridColumn headerText="Name" dataField="derbyName" sortable="false" />
+				<mx:DataGridColumn headerText="JA" dataField="jammerAppearances" width="40" resizable="true"/>
+				<!-- The image displayed by the headerRenderer is determined by the headerText, which is NOT displayed in the application -->
+				<mx:DataGridColumn headerText="PlayerImage" dataField="playerImage" width="20" sortable="false" resizable="false"
+								   headerRenderer="com.rollerderbyproductions.jamtracker.views.itemRenderer.ImageHeaderRenderer" 
+								   itemRenderer="com.rollerderbyproductions.jamtracker.views.itemRenderer.RosterGridImageIndicatorItemRenderer" />
+			</mx:columns>
+		</mx:DataGrid>	
+	</s:VGroup>
+	
+</s:Group>

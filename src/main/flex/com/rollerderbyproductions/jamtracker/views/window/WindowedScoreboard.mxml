@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Window xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:scoreboard="com.rollerderbyproductions.jamtracker.views.scoreboard.*"
+		 title="Scoreboard"		 
+		 showStatusBar="false"
+		 backgroundColor="0x000000"
+		 windowComplete="init(event)"
+		 visible="false"
+		 resize="resizeHandler(event)"
+		 close="closeWindow()">
+	
+	<fx:Script>
+		<![CDATA[
+			import com.rollerderbyproductions.jamtracker.events.ScoreboardEvent;
+			import com.rollerderbyproductions.jamtracker.presentation.MainPresentationModel;
+			
+			import mx.controls.Alert;
+			import mx.events.AIREvent;
+			import mx.events.ResizeEvent;
+			import mx.logging.ILogger;
+			import mx.logging.Log;
+			
+			private static const _LOG:ILogger = Log.getLogger("WindowedScoreboard");
+
+			[Inject] [Bindable] public var mainApp:MainPresentationModel;
+
+			private function closeWindow():void{
+				mainApp.closeWindowedScoreboard();			
+			}
+			
+			
+			private function init(event:AIREvent ):void
+			{
+				event.currentTarget.move(this.left,this.y);
+				this.visible=true;
+				
+				// Add the event listener for keyboard shortcuts
+				stage.addEventListener(KeyboardEvent.KEY_UP, keyHandler, false, 0, true);	
+			}
+
+
+			protected function resizeHandler(event:ResizeEvent):void
+			{
+				this.scaleX = this.width/1024;
+				this.scaleY = this.height/768;				
+			}
+			
+			// Then a key is pressed, this handles the event
+			public function keyHandler(event:KeyboardEvent):void {
+				mainApp.onKeyDown(event);
+			}
+			
+			[EventHandler( event="ScoreboardEvent.VIEW_CUSTOM" )]
+			public function setViewStateCurtain(event:ScoreboardEvent):void{
+				_LOG.debug("Handle VIEW_CUSTOM ["+event.viewName+"]");
+				mainScoreboard.currentState = event.viewName;
+			}
+			
+
+			[EventHandler( event="ScoreboardEvent.VIEW_MAIN" )]
+			public function setViewStateMain():void {
+				_LOG.debug("Handle VIEW_MAIN");
+				mainScoreboard.currentState = "mainScoreboard";
+			}
+
+
+		]]>
+	</fx:Script>
+
+	<scoreboard:ScoreboardStateManager id="mainScoreboard" />
+	
+</s:Window>

@@ -1,0 +1,13 @@
+/* CSS file */
+@namespace s "library://ns.adobe.com/flex/spark";
+@namespace mx "library://ns.adobe.com/flex/mx";
+
+.textInput {
+	contentBackgroundColor: #BBB;
+	color: #000;
+}
+
+.formTitle {
+	font-size: 10;
+	font-weight: bold;
+}

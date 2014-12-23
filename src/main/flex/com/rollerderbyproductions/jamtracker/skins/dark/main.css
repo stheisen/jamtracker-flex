@@ -1,0 +1,199 @@
+/* CSS file */
+@namespace s "library://ns.adobe.com/flex/spark";
+@namespace mx "library://ns.adobe.com/flex/mx";
+
+/* ------ Embeded Fonts ------ */
+@font-face {
+	src: url("/assets/font/ARIAL.ttf");
+	fontFamily: "arialSmooth";
+	embedAsCFF: true;
+	fontAntiAliasType: advanced;
+	fontSharpness: -400;
+}
+
+@font-face {
+	src: url("/assets/font/ARIALBD.ttf");
+	fontFamily: "arialSmoothBold";
+	embedAsCFF: true;
+	fontAntiAliasType: advanced;
+	fontSharpness: -400;
+	fontWeight: bold;
+}
+
+@font-face {
+	src: url("/assets/font/digital-7_mono.ttf");
+	fontFamily: "digital7";
+	embedAsCFF: true;
+}
+
+
+#buttonBar {
+	color: #000;
+}
+
+.dropDownList {
+	color: #000;
+}
+
+/* This style is used for multiline checkboxes instead of styling the component 
+   this was done because I could not figure out how to align the checkbox to 
+   the top of a multiline label */
+.checkboxLabel {
+	padding-top: 5;
+	padding-left: 0;
+}	
+
+.helpContainer {
+	border-color: #5177aa;
+	border-weight: 2;
+	background-color: #aaa;
+	color: #000;
+	font-size: 10;
+	corner-radius: 2;
+	drop-shadow-visible: true;
+}	
+
+.largeNBold {
+	font-size: 18;
+	font-weight: bold;
+}
+
+.messageTextArea {
+	content-background-alpha: 0;
+	font-size: 11;
+	border-visible: false;
+}	
+
+.splashContainer {
+	border-color: #96d642;
+	border-weight: 2;
+	background-color: #444;
+	color: #DDD;
+}
+
+.transparancyBorderContainer {
+	border-color: #000000;
+	background-image: Embed("/assets/background/transparency.png");
+	background-image-fill-mode: repeat;
+}
+
+.panelButton{
+	skin-class: ClassReference("com.rollerderbyproductions.jamtracker.skins.dark.ButtonSkin");	
+	color: #000;
+}
+
+.iconButton {
+	skin-class: ClassReference("com.rollerderbyproductions.jamtracker.skins.dark.IconButtonSkin"); 
+	color: #000;
+}
+
+.iconToggleButton {
+	skin-class: ClassReference("com.rollerderbyproductions.jamtracker.skins.dark.IconToggleButtonSkin");
+}
+
+.iconTabBar {
+	skin-class: ClassReference("com.rollerderbyproductions.jamtracker.skins.dark.IconTabBarSkin");
+	color: #000;
+}
+
+.centeredIconButton {
+	skin-class: ClassReference("com.rollerderbyproductions.jamtracker.skins.dark.IconCenteredButtonSkin");
+}
+
+.centeredIconToggleButton {
+	skin-class: ClassReference("com.rollerderbyproductions.jamtracker.skins.dark.IconCenteredToggleButtonSkin");
+}
+
+.mainLabel {
+	color: #DDD;
+}
+
+.menuLabel {
+	color: #666;
+}
+
+.brightLabel {
+	color: #DDD;
+}
+
+.panel {
+	skin-class: ClassReference("com.rollerderbyproductions.jamtracker.skins.dark.PanelSkin");
+	drop-shadow-visible: false;
+	background-color: #333;
+	color: #DDD;
+}
+
+.panel s|Button {
+	color: #000;
+}
+
+.panel mx|ComboBox {
+	color: #000;
+}
+.panel s|CheckBox{
+	skin-class: ClassReference("com.rollerderbyproductions.jamtracker.skins.dark.CheckboxSkin");
+}	
+
+.panelContainer {
+	border-color: #000;
+	background-color: #444;
+	color: #DDD;
+}
+
+.panelSubContainer {
+	border-color: #000;
+	background-color: #343434;
+	color: #DDD;
+}
+
+
+.panelContainer s|TextInput {
+	focus-color: #ffff00;
+	border-color: #000;
+}
+
+.panelContainerTitle {
+	font-family: arialSmoothBold;
+	font-size: 12;
+	font-weight: bold;
+	color: #96d642;
+}
+
+.popupContainer {
+	border-color: #000;
+	background-color: #444;
+	color: #DDD;
+}
+
+
+#titleBar {
+	color: #666;
+}
+
+mx|Alert{
+	header-height:20;
+	background-color: #333;
+	color: #DDD;
+	border-color : #000;
+	drop-shadow-visible: true;	
+	title-style-name: "alertTitle";
+	button-style-name: "alertButton";
+}
+.alertTitle{
+	font-weight :bold;
+	color :#000;
+}
+.alertButton {
+	color: #000;
+	accent-color: #777;
+}
+
+.alertButton:selected {
+	color: #F00;
+}
+
+.versionLabel {
+	font-family: arialSmoothBold;
+	font-size: 10;
+	font-weight: bold;
+}

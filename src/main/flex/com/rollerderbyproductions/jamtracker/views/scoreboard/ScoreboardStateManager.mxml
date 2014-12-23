@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:SkinnableContainer  xmlns:fx="http://ns.adobe.com/mxml/2009"
+					   xmlns:controls="com.rollerderbyproductions.jamtracker.controls.*"
+					   xmlns:s="library://ns.adobe.com/flex/spark" 
+					   xmlns:mx="library://ns.adobe.com/flex/mx"
+					   xmlns:scoreboard="com.rollerderbyproductions.jamtracker.views.scoreboard.*"
+					   backgroundColor="0x000000"
+					   minWidth="1024" minHeight="768"
+					   maxWidth="1024" maxHeight="768"
+					   currentState="mainScoreboard">
+	<fx:Script>
+		<![CDATA[
+			import com.rollerderbyproductions.jamtracker.model.ViewsModel;
+			import mx.controls.Alert;
+		]]>
+	</fx:Script>
+		
+	<s:states>
+		<s:State name="mainScoreboard"  />
+		<s:State name="INTERMISSION_VIEW"  />
+		<s:State name="PREGAME_VIEW"  />
+		<s:State name="POSTGAME_VIEW"  />
+		<s:State name="CURTAIN_VIEW"  />
+	</s:states>
+
+	
+	<s:transitions>		
+		<s:Transition toState="*" >
+			<s:Fade targets="{ [ mainScoreboard, INTERMISSION_VIEW, PREGAME_VIEW, POSTGAME_VIEW, CURTAIN_VIEW ] }" duration="1000"/>
+		</s:Transition>
+	</s:transitions>
+
+	
+	<s:Group height="100%" width="100%" clipAndEnableScrolling="true">
+		<scoreboard:MainScoreboard id="mainScoreboard" includeIn="mainScoreboard" itemCreationPolicy="immediate"/> 
+		<scoreboard:CustomScoreboardView id="INTERMISSION_VIEW" includeIn="INTERMISSION_VIEW" viewType="{ViewsModel.INTERMISSION_VIEW}" itemDestructionPolicy="auto"/>		
+		<scoreboard:CustomScoreboardView id="PREGAME_VIEW" includeIn="PREGAME_VIEW" viewType="{ViewsModel.PREGAME_VIEW}" itemDestructionPolicy="auto"/>		
+		<scoreboard:CustomScoreboardView id="POSTGAME_VIEW" includeIn="POSTGAME_VIEW" viewType="{ViewsModel.POSTGAME_VIEW}" itemDestructionPolicy="auto"/>		
+		<scoreboard:CustomScoreboardView id="CURTAIN_VIEW" includeIn="CURTAIN_VIEW" viewType="{ViewsModel.CURTAIN_VIEW}" itemDestructionPolicy="auto"/>		
+	</s:Group>
+	
+</s:SkinnableContainer>

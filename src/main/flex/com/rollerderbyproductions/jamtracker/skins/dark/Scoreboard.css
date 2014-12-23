@@ -1,0 +1,53 @@
+/* CSS file */
+@namespace s "library://ns.adobe.com/flex/spark";
+@namespace mx "library://ns.adobe.com/flex/mx";
+
+.borderContainer {
+	corner-radius: 3;
+	border-weight: 3;
+	background-color: #2D2D2D
+}
+.boardLabel {
+	font-family: arialSmooth;
+}
+.boardLabelBold {
+	font-family: arialSmoothBold;
+	font-size: 36;
+	text-align: center;
+	font-weight: bold;
+}
+.clockLED{
+	font-size: 120;
+	font-family: digital7;
+	text-align: right;
+}
+.clockTitle {
+	font-family: arialSmooth;
+	font-size: 17;
+	vertical-align: middle;
+	text-align: center;
+	color: #FFFFFF;
+}
+.largeLED{
+	font-size: 140;
+	font-family: digital7;
+	text-align: right;
+}
+
+.leadJammerLabel{
+	font-family: arialSmoothBold;
+	font-weight: bold;
+}
+
+.mediumLED{
+	font-size: 60;
+	font-family: digital7;
+	text-align: right;
+}
+.jammerName{
+	font-family: arialSmooth;
+}
+.jammerNumber{
+	font-family: arialSmooth;
+	font-size: 36;
+}

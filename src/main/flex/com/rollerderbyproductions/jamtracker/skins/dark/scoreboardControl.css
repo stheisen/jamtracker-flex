@@ -1,0 +1,68 @@
+/* CSS file */
+@namespace s "library://ns.adobe.com/flex/spark";
+@namespace mx "library://ns.adobe.com/flex/mx";
+@namespace controls "com.rollerderbyproductions.jamtracker.controls.*";
+
+.clockTextInput {
+	contentBackgroundColor: #BBB;
+	text-align: center;
+	font-weight: bold;
+	color: #000;
+	font-size: 15;
+	padding-bottom: 0;
+}
+.clockTextInput:disabled {
+	border-color: #F00;
+	contentBackgroundColor: #AAA;
+	color: #000;
+}
+
+.scoringTextInput {
+	contentBackgroundColor: #BBB;
+	font-size: 18;
+	font-weight: bold;
+	text-align: center;
+	color: #000;
+	padding-top: 4;
+	padding-bottom: 0;
+}	
+
+.warningBorderContainer{
+	corner-radius: 2;
+	border-color: #F00;	
+	border-weight: 2;
+	background-color: #d1cf2c;
+	color: #000;
+}
+#homeBorderContainer{
+	border-color: #222;
+}
+#visitorBorderContainer {
+	border-color: #222;
+}	
+	
+.teamScore {
+	color: #000;
+}
+
+.teamTimeouts {
+	color: #000;
+}
+
+.clockLabel {
+	font-weight: bold;
+	font-size: 10;
+}
+.smallText {
+	font-size: 10;
+	color: #222;
+}
+.teamName {
+	font-size: 12;
+	font-weight: bold;
+	color: black;
+}
+.periodLabel {
+	font-size: 12;
+	font-weight: bold;
+}

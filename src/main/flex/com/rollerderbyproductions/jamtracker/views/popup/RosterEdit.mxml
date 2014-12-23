@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:controls="com.rollerderbyproductions.jamtracker.controls.*"
+			   width="800" 
+			   height="450" 
+			   title="Edit Players on the {model.associatedTeam.shortName} Roster"
+			   backgroundColor="0x222222"
+			   close="cancel();"
+			   enabled="{model.viewEnabled}"
+			   currentState="{model.currentViewState}"
+			   creationComplete="model.init(); defaultSort();">
+
+	<fx:Script>
+		<![CDATA[
+			import com.rollerderbyproductions.jamtracker.domain.Player;
+			import com.rollerderbyproductions.jamtracker.model.ApplicationModel;
+			import com.rollerderbyproductions.jamtracker.model.AssetModel;
+			import com.rollerderbyproductions.jamtracker.presentation.input.SettingsConfigPresentationModel;
+			import com.rollerderbyproductions.jamtracker.presentation.popup.RosterEditPresentationModel;
+			
+			import mx.events.DataGridEvent;
+			import mx.events.ListEvent;
+			import mx.utils.ObjectUtil;
+			
+			[Bindable][Inject] public var model:RosterEditPresentationModel;
+			[Bindable][Inject] public var controller:SettingsConfigPresentationModel;
+			
+
+			/** 
+			 * This event is called when a user clicks on a player in the roster
+			 */
+			protected function teamRoster_itemClickHandler(event:ListEvent):void
+			{
+				if (event.columnIndex != 0){
+					// Set the selected player and make a copy of this player for editing
+					model.playerSelected = event.currentTarget.selectedItem as Player;
+					model.playerEditing = ObjectUtil.copy(model.playerSelected) as Player;
+					model.setViewMode(model.MODE_EDIT);					
+					// If the PlayerImage is not null, then determine the warning status
+					if (model.playerEditing.playerImage != null) model.determineImageWarning(model.playerEditing.playerImage.data);
+					model.setImageFlag();
+				}
+			}
+			
+			/**
+			 * Handles the close form event
+			 */
+			protected function close():void {
+				// We set the focus on the form to prevent an unexplained FLEX runtime error
+				teamForm.setFocus();
+				model.closeWindow_clickHandler(this);
+				model.dispatchUpdateLeadJammerInformation();
+			}
+
+			/**
+			 * Handles the close form event
+			 */
+			protected function cancel():void {
+				// We set the focus on the form to prevent an unexplained FLEX runtime error
+				teamForm.setFocus();
+				model.cancelWindow_clickHandler(this);
+				model.dispatchUpdateLeadJammerInformation();
+			}
+
+			/**
+			 * Sets the dataGrid to the default sort
+			 **/
+			protected function defaultSort():void {
+				teamRoster.dispatchEvent(new DataGridEvent(DataGridEvent.HEADER_RELEASE, false, true, 1, null, 0, null, null, 0));
+			}
+
+		]]>
+	</fx:Script>
+
+	<s:states>
+		<s:State name="MODE_EDIT"  />
+		<s:State name="MODE_NEW" />
+	</s:states>
+	
+	<s:VGroup width="100%" height="100%">
+		
+		<s:HGroup width="100%" height="100%" paddingTop="10" paddingRight="10" paddingLeft="10">		
+			<s:Panel styleName="panel" title.MODE_NEW="Add A Player" title.MODE_EDIT="Modify Selected Player" width="50%" height="100%">
+				<s:BorderContainer styleName="panelContainer" width="100%" height="100%">
+					<s:VGroup width="100%" height="100%" paddingLeft="5" paddingRight="5">
+						<mx:Form id="teamForm" width="100%" styleName="formStyle" horizontalGap="5" indicatorGap="5" paddingTop="10" paddingBottom="5">
+							<mx:FormItem label="Jersey Number:" direction="horizontal">
+								<s:TextInput text="@{model.playerEditing.number}" styleName="textInput" 
+											 width="100" maxChars="30" 
+											 focusOut="{model.playerEditing.trimWhiteSpace();}" />
+							</mx:FormItem>
+							<mx:FormItem label="Derby Name:" direction="horizontal">
+								<s:TextInput text="@{model.playerEditing.derbyName}" styleName="textInput" 
+											 width="200" maxChars="50" 
+											 focusOut="{model.playerEditing.trimWhiteSpace();}" />
+							</mx:FormItem>
+							<mx:FormItem direction="horizontal" width="100%">
+								<s:HGroup width="100%">
+									<s:CheckBox selected="@{model.playerEditing.active}" />
+									<s:Label text="This player is on the active roster" styleName="checkboxLabel" width="100%" lineBreak="toFit" maxDisplayedLines="2"/>														
+								</s:HGroup>
+							</mx:FormItem>
+							<mx:FormItem label="Player Image:" direction="horizontal">
+								<s:VGroup>
+									<s:HGroup verticalAlign="bottom">
+										<s:BorderContainer styleName="transparancyBorderContainer" width="147" height="111">
+											<mx:Image source="{model.playerEditing.playerImage.data}" width="100%" height="100%" 
+													  scaleContent="true"
+													  horizontalAlign="center"
+													  verticalAlign="middle"/>
+										</s:BorderContainer>
+										<mx:Image source="{AssetModel.ICON_WARNING_CLASS}" visible="{model.displayImageSizeWarning}"
+												  toolTip="{ApplicationModel.MESSAGE_PLAYER_IMAGE_EXCEED_MAX_SIZE}" />
+									</s:HGroup>
+									<s:HGroup width="100%" horizontalAlign="center" paddingRight="26">
+										<controls:IconButton label="UPDATE" width="90"
+															 iconUp="{AssetModel.ICON_ADDIMAGE16_CLASS}"
+															 click="model.imageUpload_ClickHandler()" 
+															 toolTip="Update Player Image"
+															 styleName="iconButton" />
+										<controls:IconButton iconUp="{AssetModel.ICON_REMOVE16_CLASS}" enabled="{model.playerSelectedHasImage}"
+															 toolTip="Remove Player Image" styleName="centeredIconButton" width="22"
+															 click="model.deleteImage_clickHandler()"/>
+										<controls:IconButton iconUp="{AssetModel.ICON_EXPORT16_CLASS}" enabled="{model.playerSelectedHasImage}"
+															 toolTip="Export Player Image" styleName="centeredIconButton" width="22"
+															 click="model.exportImage_clickHandler()"/>
+									</s:HGroup>
+								</s:VGroup>
+							</mx:FormItem>
+							<mx:FormItem direction="horizontal">
+								<s:HGroup>
+									<s:CheckBox selected="@{model.playerEditing.userImageBorder}"/>
+									<s:Label text="Use Lead Jammer image border" styleName="checkboxLabel" width="100%" lineBreak="toFit" maxDisplayedLines="2"/>														
+								</s:HGroup>
+							</mx:FormItem>
+
+						</mx:Form>
+						
+						
+						<mx:HRule strokeWidth="2" strokeColor="0x222222" shadowColor="0x515151" width="100%" />
+						
+						<s:HGroup width="100%" horizontalAlign="center" includeIn="MODE_NEW">
+							<s:Button label="Cancel" width="75" click="model.cancelUserEditButton_clickHandler()"/>
+							<s:Button label="Add"    width="75" click="model.saveAddButton_clickHandler()"/>
+						</s:HGroup>
+						<s:HGroup width="100%" horizontalAlign="center" includeIn="MODE_EDIT">
+							<s:Button label="Cancel" width="75" click="model.cancelUserEditButton_clickHandler()"/>
+							<s:Button label="Delete" width="75" click="model.deleteButton_clickHandler()"/>
+							<s:Button label="Update"   width="75" click="model.saveUpdate_clickHandler()"/>
+						</s:HGroup>
+					</s:VGroup>
+				</s:BorderContainer>
+			</s:Panel>
+	
+			<s:Panel styleName="panel" title="Team Roster" width="50%" height="100%">
+				<mx:DataGrid id="teamRoster" dataProvider="{model.associatedTeam.teamRoster}" width="100%" 
+							rowCount="15" rowHeight="20" itemClick="teamRoster_itemClickHandler(event)"
+							headerStyleName="rosterGridHeader" styleName="rosterGrid"> 
+					<mx:columns>
+						<mx:DataGridColumn headerText="Active" dataField="active" width="55">
+							<mx:itemRenderer>
+								<fx:Component>
+									<mx:CheckBox click="data.active=!data.active"  selected="{data.active}" textAlign="center" />            
+								</fx:Component>                        
+							</mx:itemRenderer>
+						</mx:DataGridColumn>
+						<mx:DataGridColumn headerText="No." dataField="number" width="45" resizable="true" />
+						<mx:DataGridColumn headerText="Name" dataField="derbyName" />						
+						<mx:DataGridColumn headerText="PlayerImage" dataField="playerImage" width="30" resizable="false"
+										   headerRenderer="com.rollerderbyproductions.jamtracker.views.itemRenderer.ImageHeaderRenderer" 
+										   itemRenderer="com.rollerderbyproductions.jamtracker.views.itemRenderer.RosterGridImageIndicatorItemRenderer" />
+					</mx:columns>
+				</mx:DataGrid>				
+			</s:Panel>
+		</s:HGroup>
+
+		<s:HGroup width="100%" horizontalAlign="right" paddingLeft="10" paddingRight="10" paddingBottom="10" paddingTop="5">
+			<s:HGroup horizontalAlign="left" gap="5">
+				
+				<controls:IconButton label="Load Team" width="96"
+									 iconUp="{AssetModel.ICON_OPEN16_CLASS}"
+									 click="model.loadTeam_clickHandler()" 
+									 toolTip="Load a team configuration"
+									 styleName="iconButton" />
+
+				<controls:IconButton label="Save Team" width="96"
+									 iconUp="{AssetModel.ICON_SAVE16_CLASS}"
+									 click="model.saveTeam_clickHandler()" 
+									 toolTip="Save this team configuration"
+									 styleName="iconButton" />
+				
+				<controls:IconButton label="New Team" width="96"
+									 iconUp="{AssetModel.ICON_NEW16_CLASS}"
+									 click="model.newTeam_clickHandler()" 
+									 toolTip="Start with a new team"
+									 styleName="iconButton" />
+
+			</s:HGroup>
+			<s:HGroup horizontalAlign="right" width="100%">
+				
+				<controls:IconButton label="Cancel" width="76"
+									 iconUp="{AssetModel.ICON_CANCEL16_CLASS}"
+									 click="cancel()" 
+									 toolTip="Cancel Changes"
+									 styleName="iconButton" />
+
+				<controls:IconButton label="Close" width="76"
+									 iconUp="{AssetModel.ICON_CONFIRM16_CLASS}"
+									 click="close()" 
+									 toolTip="Close and Save Changes"
+									 styleName="iconButton" />
+			</s:HGroup>
+			
+		</s:HGroup>
+
+	</s:VGroup>
+	
+</s:TitleWindow>

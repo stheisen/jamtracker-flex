@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:controls="com.rollerderbyproductions.jamtracker.controls.*"
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="400" height="300">
+
+	<fx:Style source="com/rollerderbyproductions/jamtracker/skins/dark/SettingsOptions.css" />
+
+	<fx:Script>
+		<![CDATA[
+			import com.rollerderbyproductions.jamtracker.domain.Clock;
+			import com.rollerderbyproductions.jamtracker.model.ApplicationModel;
+			import com.rollerderbyproductions.jamtracker.model.AssetModel;
+			import com.rollerderbyproductions.jamtracker.presentation.MainPresentationModel;
+			import com.rollerderbyproductions.jamtracker.presentation.input.ScoreboardConfigPresentationModel;
+			import com.rollerderbyproductions.jamtracker.presentation.input.SettingsConfigPresentationModel;
+			import com.rollerderbyproductions.jamtracker.presentation.input.ViewControlPresentationModel;
+			import com.rollerderbyproductions.jamtracker.util.LoggingConfig;
+			
+			import mx.controls.Alert;
+			import mx.events.ListEvent;
+			
+			[Bindable][Inject] public var applicationModel:ApplicationModel;		
+			[Bindable][Inject] public var mainPresentationModel:MainPresentationModel;
+			[Bindable][Inject] public var model:SettingsConfigPresentationModel;
+			[Bindable][Inject] public var controller:ScoreboardConfigPresentationModel;
+
+
+
+			protected function periodResetValue_changeHandler(event:Event):void
+			{
+				model.validateResetValue(model.scoring.gameClock, periodResetValue.text);
+				periodResetValue.text=model.scoring.gameClock.formattedResetTime;
+			}
+
+			protected function periodHundrethsTrigger_changeHandler(event:Event):void
+			{
+				model.validateHundrethsTriggerValue(model.scoring.gameClock, periodHundrethsTrigger.text);
+				periodHundrethsTrigger.text=model.scoring.gameClock.formattedHundrethsTrigger;
+			}
+
+			protected function jamResetValue_changeHandler(event:Event):void
+			{
+				model.validateResetValue(model.scoring.jamClock, jamResetValue.text);
+				jamResetValue.text=model.scoring.jamClock.formattedResetTime;
+			}
+
+			protected function jamHundrethsTrigger_changeHandler(event:Event):void
+			{
+				model.validateHundrethsTriggerValue(model.scoring.jamClock, jamHundrethsTrigger.text);
+				jamHundrethsTrigger.text=model.scoring.jamClock.formattedHundrethsTrigger;
+			}
+
+			protected function breakResetValue_changeHandler(event:Event):void
+			{
+				model.validateResetValue(model.scoring.breakClock, breakResetValue.text)
+				breakResetValue.text=model.scoring.breakClock.formattedResetTime;
+			}
+			
+			protected function breakHundrethsTrigger_changeHandler(event:Event):void
+			{
+				model.validateHundrethsTriggerValue(model.scoring.breakClock, breakHundrethsTrigger.text);
+				breakHundrethsTrigger.text=model.scoring.breakClock.formattedHundrethsTrigger;
+			}
+
+			protected function timeoutResetValue_changeHandler(event:Event):void
+			{
+				model.validateResetValue(model.scoring.timeoutClock, timeoutResetValue.text);
+				timeoutResetValue.text=model.scoring.timeoutClock.formattedResetTime;
+			}
+			
+			protected function timeoutHundrethsTrigger_changeHandler(event:Event):void
+			{
+				model.validateHundrethsTriggerValue(model.scoring.timeoutClock, timeoutHundrethsTrigger.text)
+				timeoutHundrethsTrigger.text=model.scoring.timeoutClock.formattedHundrethsTrigger;
+			}
+			
+			protected function intermissionResetValue_changeHandler(event:Event):void
+			{
+				model.validateResetValue(model.scoring.intermissionClock, intermissionResetValue.text)
+				intermissionResetValue.text=model.scoring.intermissionClock.formattedResetTime;
+			}
+			
+			protected function intermissionHundrethsTrigger_changeHandler(event:Event):void
+			{
+				model.validateHundrethsTriggerValue(model.scoring.intermissionClock, intermissionHundrethsTrigger.text)
+				intermissionHundrethsTrigger.text=model.scoring.intermissionClock.formattedHundrethsTrigger;
+			}
+			
+
+			protected function totalPeriods_focusOutHandler(event:FocusEvent):void
+			{
+				
+				model.setFinalPeriodnumber(parseInt(totalPeriods.text));
+				totalPeriods.text=model.settingsModel.finalPeriodNumber.toString();
+			}
+
+			protected function totalPeriods_teamTimeoutsHandler(event:FocusEvent):void
+			{
+				
+				model.setResetTeamTimeoutCount(parseInt(teamTimeouts.text));
+				teamTimeouts.text=model.settingsModel.resetTeamTimeoutCount.toString();
+			}
+
+
+		]]>
+	</fx:Script>
+	
+	<s:VGroup width="100%" height="100%" horizontalAlign="center">
+		
+		<s:BorderContainer styleName="panelContainer" width="100%">
+			<s:VGroup paddingTop="10" paddingLeft="10" paddingRight="10" width="100%" gap="3">
+				<s:HGroup width="100%" >
+					<s:CheckBox selected="@{model.settingsModel.jamClockAutostartOnBreakExpire}"/>
+					<s:Label text="Autostart the jam clock when a break expires" styleName="checkboxLabel" width="100%"/>					
+				</s:HGroup>
+				<s:HGroup width="100%">
+					<s:CheckBox selected="@{model.settingsModel.breakClockAutostartOnJamStop}"/>
+					<s:Label text="Autostart the break clock when a jam is stopped" styleName="checkboxLabel" width="100%"/>					
+				</s:HGroup>
+				<s:HGroup width="100%" >
+					<s:CheckBox selected="@{model.settingsModel.breakClockAutostartOnTimeoutExpire}"/>
+					<s:Label text="Autostart the break clock when a timeout expires" styleName="checkboxLabel" width="100%"/>					
+				</s:HGroup>
+				<s:HGroup width="100%" >
+					<s:CheckBox selected="@{model.settingsModel.breakClockAutostartOnJamExpire}"/>
+					<s:Label text="Autostart the break clock when a jam expires" styleName="checkboxLabel" width="100%"/>					
+				</s:HGroup>
+				<s:HGroup width="100%" >
+					<s:CheckBox selected="@{model.settingsModel.displayOfficialTimeoutDuration}"/>
+					<s:Label text="Display the duration of any official timeout" styleName="checkboxLabel" width="100%"/>					
+				</s:HGroup>
+				<s:HGroup width="100%" >
+					<s:CheckBox selected="@{model.settingsModel.hideLeadJammerIndicatorAtStop}"/>
+					<s:Label text="Hide lead jammer indicator when a jam is stopped." styleName="checkboxLabel" width="100%"/>					
+				</s:HGroup>
+				<s:HGroup width="100%" >
+					<s:CheckBox selected="@{model.settingsModel.resetSelectedJammersAtStop}"/>
+					<s:Label text="Reset the selected active jammers when a jam is stopped." styleName="checkboxLabel" width="100%"/>					
+				</s:HGroup>
+				<s:HGroup width="100%" >
+					<s:CheckBox selected="@{model.settingsModel.resetJamCountAtNewPeriod}"/>
+					<s:Label text="Reset the jam count when a new period is initalized." styleName="checkboxLabel" width="100%"/>					
+				</s:HGroup>
+				<s:HGroup width="100%" >
+					<s:CheckBox selected="@{model.settingsModel.synchBreakClockwithGameClock}"/>
+					<s:Label text="Synchronize break clock with period clock when period clock is less then break length." styleName="checkboxLabel" width="100%"/>					
+				</s:HGroup>
+				<s:HGroup width="100%" >
+					<s:CheckBox selected="@{model.settingsModel.customViewsAutoSwitch}"/>
+					<s:Label text="Automatically switch to PREGAME, INTERMISSION and POSTGAME views." styleName="checkboxLabel" width="100%"/>					
+				</s:HGroup>
+				<s:HGroup width="100%" >
+					<s:CheckBox selected="@{model.settingsModel.disableKeyboardShortcuts}" />
+					<s:Label text="Disable All Keyboard Shortcuts" styleName="checkboxLabel" width="100%"/>					
+				</s:HGroup>
+				<s:HGroup width="100%" >
+					<s:CheckBox selected="@{model.settingsModel.disableRightClickPrimaryAction}" />
+					<s:Label text="Disable Right Click for Starting and Stoping Jam Clock" styleName="checkboxLabel" width="100%"/>					
+				</s:HGroup>
+				<s:HGroup width="100%" >
+					<s:CheckBox selected="@{model.settingsModel.checkForUpdates}"/>
+					<s:Label text="Periodically check rollerderbyproductions.com for JamTracker software updates" styleName="checkboxLabel" width="100%"/>
+				</s:HGroup>
+				<s:HGroup width="100%" horizontalAlign="left">
+					<s:CheckBox selected="@{model.settingsModel.activeDebugLog}" id="debugCheckbox"/>
+					<s:Label text="Enable JamTracker event logging (Requires JamTracker restart)" styleName="checkboxLabel" width="100%"/>
+				</s:HGroup>
+
+				<mx:HRule strokeWidth="2" strokeColor="0x222222" shadowColor="0x515151" width="100%" />
+				<mx:Form id="form2" indicatorGap="5" verticalGap="3" paddingLeft="0" paddingTop="3">
+					<mx:FormItem label="Total periods:" direction="horizontal" horizontalGap="18">
+						<s:TextInput id="totalPeriods" text="{model.settingsModel.finalPeriodNumber}" styleName="textInput" 
+									 focusIn="{model.suspendKeyboardShortcuts();}" 
+									 focusOut="totalPeriods_focusOutHandler(event);" 
+									 enter="clockForm.setFocus();"
+									 width="30" maxChars="1" textAlign="center" restrict="1-9" />
+					</mx:FormItem>
+					<mx:FormItem label="Team Timeouts:" direction="horizontal" horizontalGap="18">
+						<s:TextInput id="teamTimeouts" text="{model.settingsModel.resetTeamTimeoutCount}" styleName="textInput" 
+									 focusIn="{model.suspendKeyboardShortcuts();}" 
+									 focusOut="totalPeriods_teamTimeoutsHandler(event);" 
+									 enter="clockForm.setFocus();"
+									 width="30" maxChars="1" textAlign="center" restrict="1-9" />
+						<s:HGroup>
+							<s:CheckBox selected="@{model.settingsModel.resetTimeoutsEachPeriod}"/>
+							<s:Label text="Reset when a new period is initalized" styleName="checkboxLabel" width="100%"/>							
+						</s:HGroup>
+					</mx:FormItem>
+					<mx:FormItem label="Display Format:" direction="horizontal">
+						<mx:ComboBox id="windowChoice" dataProvider="{mainPresentationModel.scoreboardWindowOptions}" enabled="{!mainPresentationModel.windowOpened}"/>
+						<s:Button label="Scan"  click="mainPresentationModel.buildScreenOptions()" width="50" enabled="{!mainPresentationModel.windowOpened}" toolTip="Scan for recently added displays"/>
+						<s:Button label="Open"  click="mainPresentationModel.displayDetachedScoreboard(windowChoice.value.toString())" enabled="{!mainPresentationModel.windowOpened}" width="60" toolTip="Open the main scoreboard"/>
+						<s:Button label="Close" click="mainPresentationModel.confirmCloseWindowedScoreboard()" enabled="{mainPresentationModel.windowOpened}" width="60" toolTip="Close the main scoreboard"/>
+					</mx:FormItem>
+				</mx:Form>
+
+			</s:VGroup>
+		</s:BorderContainer>
+
+		<s:BorderContainer styleName="panelContainer" width="100%" height="100%">
+			<s:VGroup width="100%" height="100%" horizontalAlign="left" verticalAlign="top" paddingTop="5" paddingBottom="5" paddingLeft="5" paddingRight="5">
+				<s:Label width="100%" text="Clock Reset Times and Hundredths Triggers" textAlign="left" styleName="panelContainerTitle" />
+				<s:VGroup width="100%" paddingLeft="5" paddingRight="5">
+				<s:BorderContainer styleName="panelSubContainer" width="100%">
+					<s:HGroup paddingTop="3" paddingRight="10" width="100%">
+						<mx:Form id="clockForm" styleName="formStyle" indicatorGap="5" verticalGap="2">
+							<mx:FormItem label="" direction="horizontal" horizontalGap="10">
+								<s:Label styleName="formTitle" text="RESET"  width="100%" paddingLeft="4"/>
+								<s:Label styleName="formTitle" text="100ths" width="100%" paddingLeft="12"/>
+							</mx:FormItem>
+							<mx:FormItem label="Period Clock:" direction="horizontal" horizontalGap="10">
+								<s:TextInput id="periodResetValue" text="{model.scoring.gameClock.formattedResetTime}"  styleName="textInput"
+											 focusIn="{model.suspendKeyboardShortcuts()}" 
+											 focusOut="periodResetValue_changeHandler(event)"
+											 enter="clockForm.setFocus()"
+											 width="45" maxChars="5" textAlign="center" restrict="0-9 :" />
+								<s:TextInput id="periodHundrethsTrigger" text="{model.scoring.gameClock.formattedHundrethsTrigger}" styleName="textInput"
+											 focusIn="{model.suspendKeyboardShortcuts()}" 
+											 focusOut="periodHundrethsTrigger_changeHandler(event)"
+											 enter="clockForm.setFocus()"
+											 width="45" maxChars="5" textAlign="center" restrict="0-9 :" />
+								<controls:IconButton iconUp="{AssetModel.ICON_RESET16_CLASS}"
+													 toolTip="Immediatly Reset Period Clock" styleName="centeredIconButton" width="22"
+													 click="model.scoring.gameClock.resetClock()"/>
+							</mx:FormItem>
+							<mx:FormItem label="Jam Clock:" direction="horizontal" horizontalGap="10">
+								<s:TextInput id="jamResetValue" text="{model.scoring.jamClock.formattedResetTime}" styleName="textInput" 
+											 focusIn="{model.suspendKeyboardShortcuts()}" 
+											 focusOut="jamResetValue_changeHandler(event)" 
+											 enter="clockForm.setFocus()"
+											 width="45" maxChars="5" textAlign="center" restrict="0-9 :" />
+								<s:TextInput id="jamHundrethsTrigger" text="{model.scoring.jamClock.formattedHundrethsTrigger}" 
+											 focusOut="{jamHundrethsTrigger_changeHandler(event)}" 
+											 enter="clockForm.setFocus()"
+											 styleName="textInput"
+											 width="45" maxChars="5" textAlign="center" restrict="0-9 :" />
+								<controls:IconButton iconUp="{AssetModel.ICON_RESET16_CLASS}"
+													 toolTip="Immediatly Reset Jam Clock" styleName="centeredIconButton" width="22"
+													 click="model.scoring.jamClock.resetClock()"/>
+							</mx:FormItem>
+							<mx:FormItem label="Break Clock:" direction="horizontal" horizontalGap="10">
+								<s:TextInput id="breakResetValue" text="{model.scoring.breakClock.formattedResetTime}" styleName="textInput" 
+											 focusIn="{model.suspendKeyboardShortcuts()}" 
+											 focusOut="breakResetValue_changeHandler(event)" 
+											 enter="clockForm.setFocus()"
+											 width="45" maxChars="5" textAlign="center" restrict="0-9 :" />
+								<s:TextInput id="breakHundrethsTrigger" text="{model.scoring.breakClock.formattedHundrethsTrigger}" styleName="textInput" 
+											 focusIn="{model.suspendKeyboardShortcuts()}" 
+											 focusOut="breakHundrethsTrigger_changeHandler(event)"
+											 enter="clockForm.setFocus()"
+											 width="45" maxChars="5" textAlign="center" restrict="0-9 :" />
+								<controls:IconButton iconUp="{AssetModel.ICON_RESET16_CLASS}"
+													 toolTip="Immediatly Reset Break Clock" styleName="centeredIconButton" width="22"
+													 click="model.scoring.breakClock.resetClock()"/>
+							</mx:FormItem>
+							<mx:FormItem label="Timeout Clock:" direction="horizontal" horizontalGap="10">
+								<s:TextInput id="timeoutResetValue" text="{model.scoring.timeoutClock.formattedResetTime}" styleName="textInput"
+											 focusIn="{model.suspendKeyboardShortcuts()}" 
+											 focusOut="timeoutResetValue_changeHandler(event)" 
+											 enter="clockForm.setFocus()"
+											 width="45" maxChars="5" textAlign="center" restrict="0-9 :" />
+								<s:TextInput id="timeoutHundrethsTrigger" text="{model.scoring.timeoutClock.formattedHundrethsTrigger}" styleName="textInput" 
+											 focusIn="{model.suspendKeyboardShortcuts()}" 
+											 focusOut="timeoutHundrethsTrigger_changeHandler(event)"
+											 enter="clockForm.setFocus()"
+											 width="45" maxChars="5" textAlign="center" restrict="0-9 :" />
+								<controls:IconButton iconUp="{AssetModel.ICON_RESET16_CLASS}"
+													 toolTip="Immediatly Reset Timeout Clock" styleName="centeredIconButton" width="22"
+													 click="model.scoring.timeoutClock.resetClock()"/>
+							</mx:FormItem>
+							<mx:FormItem label="Intermission Clock:" direction="horizontal" horizontalGap="10">
+								<s:TextInput id="intermissionResetValue" text="{model.scoring.intermissionClock.formattedResetTime}" styleName="textInput" 
+											 focusIn="{model.suspendKeyboardShortcuts()}" 
+											 focusOut="intermissionResetValue_changeHandler(event)" 
+											 enter="clockForm.setFocus()"
+											 width="45" maxChars="5" textAlign="center" restrict="0-9 :" />
+								<s:TextInput id="intermissionHundrethsTrigger" text="{model.scoring.intermissionClock.formattedHundrethsTrigger}" styleName="textInput" 
+											 focusIn="{model.suspendKeyboardShortcuts()}" 
+											 focusOut="intermissionHundrethsTrigger_changeHandler(event)"
+											 enter="clockForm.setFocus()"
+											 width="45" maxChars="5" textAlign="center" restrict="0-9 :" />
+								<controls:IconButton iconUp="{AssetModel.ICON_RESET16_CLASS}"
+													 toolTip="Immediatly Reset Intermission Clock" styleName="centeredIconButton" width="22"
+													 click="model.scoring.intermissionClock.resetClock()"/>
+							</mx:FormItem>
+						</mx:Form>
+						
+						<s:HGroup height="100%" width="100%" horizontalAlign="right" verticalAlign="middle" paddingTop="5" paddingLeft="20">
+							<s:BorderContainer styleName="helpContainer" width="200">
+								<s:VGroup width="100%" paddingBottom="5" paddingLeft="5" paddingTop="5" paddingRight="5">
+									<s:HGroup width="100%">
+										<s:Label text="Reset:" width="40" textAlign="right" fontWeight="bold" textDecoration="underline"/>
+										<s:Label text="This is the time that the cooresponding clock will be reset to as necessary." width="100%" textAlign="justify"/>									
+									</s:HGroup>
+									<s:HGroup width="100%">
+										<s:Label text="100ths:" width="40" textAlign="right" fontWeight="bold" textDecoration="underline"/>
+										<s:Label text="This is the time at which the cooresponding clock will begin displaying 100ths of a second. Set this value to 0:00 to aviod displaying this value." width="100%" textAlign="justify"/>
+									</s:HGroup>
+								</s:VGroup>
+							</s:BorderContainer>
+							
+						</s:HGroup>
+					</s:HGroup>
+					<mx:Image source="{AssetModel.ICON_QUESTION32_CLASS}" top="18" right="194" smoothBitmapContent="true"/>
+				</s:BorderContainer>
+					</s:VGroup>
+			</s:VGroup>
+		</s:BorderContainer>
+
+		
+	</s:VGroup>
+	
+</s:Group>

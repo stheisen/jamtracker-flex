@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<swiz:BeanProvider 	xmlns:swiz="http://swiz.swizframework.org"
+					xmlns:fx="http://ns.adobe.com/mxml/2009"
+					xmlns:s="library://ns.adobe.com/flex/spark" 
+					xmlns:input="com.rollerderbyproductions.jamtracker.presentation.input.*"
+					xmlns:main="com.rollerderbyproductions.jamtracker.presentation.*"
+					xmlns:model="com.rollerderbyproductions.jamtracker.model.*"
+					xmlns:jtstats="com.rollerderbyproductions.jamtracker.jtstats.*"
+					xmlns:persistance="com.rollerderbyproductions.jamtracker.persistance.*"
+					xmlns:popup="com.rollerderbyproductions.jamtracker.presentation.popup.*"
+					xmlns:scoreboard="com.rollerderbyproductions.jamtracker.presentation.scoreboard.*" 					>
+	<fx:Script>
+		<![CDATA[
+			import com.rollerderbyproductions.jamtracker.presentation.input.CustomizedViewPresentationModel;
+		]]>
+	</fx:Script>
+	
+	<!-- Models -->
+	<model:ApplicationModel id="applicationModel"/>
+	<model:AssetModel id="assetModel"/>
+	<model:ScoringModel id="scoringModel"/>
+	<model:TeamsModel id="teamsModel"/>
+	<model:ScoreboardModel id="scoreboardModel"/>
+	<model:SettingsModel id="settingsModel"/>
+	<model:ViewsModel id="viewsModel"/>
+	
+	<!--PresentationModels-->
+	<input:CustomizedViewPresentationModel />
+	<input:SettingsConfigPresentationModel />
+	<input:ScoreboardConfigPresentationModel />
+	<input:ScoreboardControlPresentationModel />
+	<input:ScoreboardViewsPresentationModel />
+	<input:TeamConfigPresentationModel />
+	<input:ViewControlPresentationModel />
+	<main:MainPresentationModel />
+	<popup:AboutPresentationModel />
+	<popup:RosterEditPresentationModel />
+	<popup:ConfigManagementPresentationModel />
+	<scoreboard:ScoreboardPresentationModel />
+	
+	<persistance:PersistanceManager />
+	
+	<jtstats:BoutStatistics />
+	
+	<!-- Prototype Beans 
+	<swiz:Prototype id="customizedViewPresentationModel" type="{ CustomizedViewPresentationModel }" />
+	-->
+	
+	<!-- We'll use the Swiz ServiceHelper to help simulate a server-side call. -->
+	<swiz:ServiceHelper id="serviceHelper" />
+	
+</swiz:BeanProvider>

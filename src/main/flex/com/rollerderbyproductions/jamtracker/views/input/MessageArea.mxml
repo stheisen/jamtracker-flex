@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 xmlns:controls="com.rollerderbyproductions.jamtracker.controls.*"
+		 initialize="configLinks()">
+	
+	<fx:Script>
+		<![CDATA[
+			import com.rollerderbyproductions.jamtracker.model.ApplicationModel;
+			import com.rollerderbyproductions.jamtracker.model.AssetModel;
+			import com.rollerderbyproductions.jamtracker.model.SettingsModel;
+			import com.rollerderbyproductions.jamtracker.presentation.input.ViewControlPresentationModel;
+			
+			import flashx.textLayout.formats.TextDecoration;
+			import flashx.textLayout.formats.TextLayoutFormat;
+			
+			[Inject][Bindable] public var applicationModel:ApplicationModel;
+			[Inject][Bindable] public var model:ViewControlPresentationModel;
+			[Inject][Bindable] public var settingsModel:SettingsModel;
+			
+			private function configLinks():void {
+				var normalTLF:TextLayoutFormat = new TextLayoutFormat();
+				normalTLF.color = 0x96d642;
+				
+				var hoverTLF:TextLayoutFormat = new TextLayoutFormat();
+				hoverTLF.color = 0x96d642;
+				hoverTLF.textDecoration = TextDecoration.NONE;
+				
+				var activeTLF:TextLayoutFormat = new TextLayoutFormat();
+				activeTLF.color = 0x96d642;
+				
+				link1.linkNormalFormat = normalTLF;
+				link1.linkHoverFormat = hoverTLF;
+				link1.linkActiveFormat = activeTLF;
+				link2.linkNormalFormat = normalTLF;
+				link2.linkHoverFormat = hoverTLF;
+				link2.linkActiveFormat = activeTLF;
+				link3.linkNormalFormat = normalTLF;
+				link3.linkHoverFormat = hoverTLF;
+				link3.linkActiveFormat = activeTLF;
+			}
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<s:VGroup height="100%" width="100%" verticalAlign="top">
+		<s:TextArea width="100%" editable="false" styleName="messageTextArea" textIndent="0" whiteSpaceCollapse="collapse" textAlign="justify">
+			<s:content>The JamTracker team thanks you for evaluating JamTracker beta v{applicationModel.versionNumber}.
+				We encourage you to visit <s:a id="link1" href="http://www.rollerderbyproductions.com" target="_blank">RollerDerbyProductions.com</s:a>
+				often to remain up-to-date with the latest JamTracker news.
+				<s:p textIndent="0" />It is Roller Derby Production's goal to make JamTracker the premier computer based Roller Derby Scoring solution in the world.
+				However, we do not expect to achieve this without the important feedback of you and our users.
+				Please send your comments and suggestions to <s:a id="link2" href="mailto:jamtracker@rollerderbyproductions.com">jamtracker@rollerderbyproductions.com</s:a>.
+				If you prefer, you may also review current and open new issues directly using our JIRA system by <s:a id="link3" href="http://jira.cybertie.net/jira/secure/BrowseProject.jspa#selectedTab=com.atlassian.jira.plugin.system.project%3Aissues-panel" target="_blank">clicking here</s:a>.
+				<s:p textIndent="0"/>Thank you for your interest in JamTracker, and we look forward to hearing from you!
+			</s:content>
+		</s:TextArea>
+	</s:VGroup>
+	
+	
+</s:Group>

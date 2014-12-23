@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="100%" height="100%">
+	
+	<fx:Script>
+		<![CDATA[
+			import com.rollerderbyproductions.jamtracker.model.ApplicationModel;
+			import com.rollerderbyproductions.jamtracker.model.AssetModel;
+						
+			[Inject] [Bindable] public var applicationModel:ApplicationModel;
+			
+			// Bind this image directly on the splash screen since ths Assett Model is not yet initialized
+			[Bindable] [Embed(source="/assets/logo/jamtracker_logo_350x128.png",mimeType="image/png")]
+			public var LOGO_JAMTRACKER_CLASS:Class;	
+		]]>
+	</fx:Script>
+	
+	<s:VGroup width="100%" height="100%" verticalAlign="middle" horizontalAlign="center">
+		<s:BorderContainer styleName="splashContainer" width="400" height="200">
+			<s:VGroup width="400" height="200" paddingBottom="10" paddingLeft="5" paddingRight="6" paddingTop="0">
+				<mx:Image source="{LOGO_JAMTRACKER_CLASS}" height="172" width="380" verticalAlign="middle" horizontalAlign="center" scaleContent="false" smoothBitmapContent="true"/>
+				<s:HGroup width="100%" height="20" horizontalAlign="center" verticalAlign="middle">
+					<s:Label text="rollerderbyproductions.com" textAlign="left" width="50%" styleName="versionLabel"/>	
+					<s:Label text="v{applicationModel.versionNumber}" textAlign="right" width="50%" styleName="versionLabel" toolTip="Made in the U.S.A."/>
+					<mx:Image source="{AssetModel.ICON_USAFLAG16_CLASS}" />
+				</s:HGroup>
+			</s:VGroup>
+		</s:BorderContainer>
+	</s:VGroup>
+	
+</s:Group>

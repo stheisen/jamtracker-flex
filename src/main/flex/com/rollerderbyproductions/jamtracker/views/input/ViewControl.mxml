@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 xmlns:controls="com.rollerderbyproductions.jamtracker.controls.*">
+	
+	<fx:Script>
+		<![CDATA[
+			import com.rollerderbyproductions.jamtracker.events.ControllerEvent;
+			import com.rollerderbyproductions.jamtracker.model.AssetModel;
+			import com.rollerderbyproductions.jamtracker.model.ViewsModel;
+			import com.rollerderbyproductions.jamtracker.presentation.MainPresentationModel;
+			import com.rollerderbyproductions.jamtracker.presentation.input.ViewControlPresentationModel;
+			
+			import mx.controls.Alert;
+			
+			import spark.events.IndexChangeEvent;
+			
+			[Inject][Bindable] public var model:ViewControlPresentationModel;
+			[Inject][Bindable] public var mainApp:MainPresentationModel;
+
+			/**
+			 * This method listens for and event to set the selected button properly
+			 */
+			[EventHandler( event="ControllerEvent.SET_MAIN_BUTTONBAR" )]
+			public function setSelectedButton(event:ControllerEvent):void {
+				switch (event.viewName){
+					case ViewsModel.MAIN_VIEW:
+						buttonBar.selectedIndex = 0;
+						break;
+					case ViewsModel.PREGAME_VIEW:
+						buttonBar.selectedIndex = 1;
+						break;
+					case ViewsModel.INTERMISSION_VIEW:
+						buttonBar.selectedIndex = 2;
+						break;
+					case ViewsModel.POSTGAME_VIEW:
+						buttonBar.selectedIndex = 3;
+						break;
+					case ViewsModel.CURTAIN_VIEW:
+						buttonBar.selectedIndex = 4;
+						break;
+				}
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<s:VGroup height="100%" width="100%" verticalAlign="middle">
+		<s:HGroup >
+			
+			<s:ButtonBar id="buttonBar"
+						 horizontalCenter="0"
+						 verticalCenter="0"
+						 requireSelection="true"
+						 change="model.btnBar_changeHandler(event)">
+				<s:layout>
+					<s:HorizontalLayout gap="4" columnWidth="105" variableColumnWidth="false"/>
+				</s:layout>
+				<s:dataProvider>
+					<!-- Changing the names of these buttons will affect their function. Make sure to reflect
+					     any name changes here in the change handler -->
+					<s:ArrayList source="[MAIN,PREGAME,INTERMISSION,POSTGAME,CURTAIN]" />
+				</s:dataProvider>
+			</s:ButtonBar>
+
+		</s:HGroup>
+	</s:VGroup>
+	
+</s:Group>

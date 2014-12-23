@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:SkinnableContainer  xmlns:fx="http://ns.adobe.com/mxml/2009"
+					   xmlns:controls="com.rollerderbyproductions.jamtracker.controls.*"
+					   xmlns:s="library://ns.adobe.com/flex/spark" 
+					   xmlns:mx="library://ns.adobe.com/flex/mx"
+					   backgroundColor="0x000000"
+					   minWidth="1024" minHeight="768"
+					   maxWidth="1024" maxHeight="768"
+					   creationComplete="initView(viewType);">
+
+	<fx:Style source="com/rollerderbyproductions/jamtracker/skins/dark/Scoreboard.css" />
+	
+	<fx:Script>
+		<![CDATA[
+			import com.rollerderbyproductions.jamtracker.domain.ViewCollection;
+			import com.rollerderbyproductions.jamtracker.events.ScoreboardEvent;
+			import com.rollerderbyproductions.jamtracker.model.AssetModel;
+			import com.rollerderbyproductions.jamtracker.model.ScoreboardModel;
+			import com.rollerderbyproductions.jamtracker.model.ViewsModel;
+			import com.rollerderbyproductions.jamtracker.presentation.input.ScoreboardControlPresentationModel;
+			
+			import mx.binding.utils.ChangeWatcher;
+			import mx.controls.Alert;
+			import mx.logging.ILogger;
+			import mx.logging.Log;
+			
+			import spark.filters.*;
+			import spark.filters.GlowFilter;
+			
+			[Bindable][Inject] public var control:ScoreboardControlPresentationModel;
+			
+			[Bindable] public var viewType:String = ViewsModel.PREGAME_VIEW;
+			[Bindable] public var viewCollection:ViewCollection;
+			[Bindable][Inject] public var viewsModel:ViewsModel;
+			[Bindable][Inject] public var scoreboard:ScoreboardModel;
+
+
+			private static const _LOG:ILogger = Log.getLogger("CustomScoreboardView");
+			private var _gloFilter:GlowFilter;
+			private var _viewType:String;
+			
+			/**
+			 * Initialize the view the first time it is created
+			 */			
+			public function initView(viewType:String):void {	
+				_viewType = viewType;
+				setViewCollection();
+			}
+			
+			[EventHandler( event="ControllerEvent.RESET_VIEWMODELS" )]
+			public function setViewCollection():void {				
+				_LOG.debug("Initialize custom scoreboard viewType ["+_viewType+"]");
+				
+				switch (_viewType){
+					case ViewsModel.PREGAME_VIEW:
+						viewCollection = viewsModel.preGame;
+						break;
+					case ViewsModel.INTERMISSION_VIEW:
+						viewCollection = viewsModel.intermission;
+						break;
+					case ViewsModel.POSTGAME_VIEW:
+						viewCollection = viewsModel.postGame;
+						break;
+					case ViewsModel.CURTAIN_VIEW:
+						viewCollection = viewsModel.curtain;
+						break;
+				}
+				
+				// Set the glow filter based on the current settinf of the scoreboard configuration
+				setGlowFilter(null);
+				// Create a change watcher that will monitor any changes to the glowEnabled scoreboard configuration setting
+				ChangeWatcher.watch(this, ["scoreboard","glowEnabled"], setGlowFilter);
+				
+			}
+			
+			
+			/**
+			 * This method determines if the glowFilter for the LED numbers should be enabled
+			 * 
+			 * @param event - NOT USED
+			 */
+			public function setGlowFilter(event:Event=null):void{
+				if (scoreboard != null){
+					if (scoreboard.glowEnabled){
+						enableGlowFilter();
+					} else {
+						disableGlowFilter();
+					}
+				}
+			}
+			
+			/**
+			 * Initialize the glow filter for all LED numbers
+			 */
+			public function enableGlowFilter():void {
+				_gloFilter = new GlowFilter(scoreboard.LED_GlowColor, scoreboard.LED_GlowAlpha, 6, 6, 2, 1, false, false);
+				intermissionClock_LED.filters = [_gloFilter];
+				homeScore_LED.filters = [_gloFilter];
+				visitorScore_LED.filters = [_gloFilter];
+			}
+			
+			/**
+			 * Disable the glow filter for all LED numbers
+			 */
+			public function disableGlowFilter():void {		
+				intermissionClock_LED.filters = null;
+				homeScore_LED.filters = null;
+				visitorScore_LED.filters = null;
+			}			
+			
+		]]>                       
+	</fx:Script>
+
+	<s:SkinnableContainer width="100%" height="100%" 
+						  backgroundColor="{viewCollection.backgroundColor.color}"
+						  backgroundAlpha="{viewCollection.backgroundColor.alpha}">
+		
+		<s:Label id="label1" text="{viewCollection.label1.text}" color="{viewCollection.label1.color}"
+				 x="{viewCollection.label1.x}" 
+				 y="{viewCollection.label1.y}" 
+				 scaleX="{viewCollection.label1.scale}" 
+				 scaleY="{viewCollection.label1.scale}" 
+				 visible="{viewCollection.label1.visible}" 
+				 alpha="{viewCollection.label1.alpha}"
+				 height="36" fontSize="36" styleName="boardLabel" depth="5"/>
+
+		<s:Label id="label2" text="{viewCollection.label2.text}" color="{viewCollection.label2.color}"
+				 x="{viewCollection.label2.x}" 
+				 y="{viewCollection.label2.y}" 
+				 scaleX="{viewCollection.label2.scale}" 
+				 scaleY="{viewCollection.label2.scale}" 
+				 visible="{viewCollection.label2.visible}" 
+				 alpha="{viewCollection.label2.alpha}"
+				 height="36" fontSize="36" styleName="boardLabel" depth="5"/>
+
+		<s:Label id="label3" text="{viewCollection.label3.text}" color="{viewCollection.label3.color}"
+				 x="{viewCollection.label3.x}" 
+				 y="{viewCollection.label3.y}" 
+				 scaleX="{viewCollection.label3.scale}" 
+				 scaleY="{viewCollection.label3.scale}" 
+				 visible="{viewCollection.label3.visible}" 
+				 alpha="{viewCollection.label3.alpha}"
+				 height="36" fontSize="36" styleName="boardLabel" depth="5"/>
+
+		<s:Label id="label4" text="{viewCollection.label4.text}" color="{viewCollection.label4.color}"
+				 x="{viewCollection.label4.x}" 
+				 y="{viewCollection.label4.y}" 
+				 scaleX="{viewCollection.label4.scale}" 
+				 scaleY="{viewCollection.label4.scale}" 
+				 visible="{viewCollection.label4.visible}" 
+				 alpha="{viewCollection.label4.alpha}"
+				 height="36" fontSize="36" styleName="boardLabel" depth="5"/>
+
+		
+		
+		<mx:Image id="backgroundImg" source="{viewCollection.backgroundImage.appImage.data}" width="100%" height="100%" 
+				  scaleContent="true" smoothBitmapContent="true" alpha="{viewCollection.backgroundImage.alpha}"
+				  horizontalAlign="center" verticalAlign="middle" visible="{viewCollection.backgroundImage.visible}"
+				  maintainAspectRatio="false"/>
+
+
+		<mx:Image id="foregroundImg" 
+				  source="{viewCollection.forgroundImage.appImage.data}" 
+				  x="{viewCollection.forgroundImage.x}" 
+				  y="{viewCollection.forgroundImage.y}" 
+				  scaleX="{viewCollection.forgroundImage.scale}" 
+				  scaleY="{viewCollection.forgroundImage.scale}"
+				  visible="{viewCollection.forgroundImage.visible}"
+				  alpha="{viewCollection.forgroundImage.alpha}"
+				  maintainAspectRatio="true" smoothBitmapContent="true" horizontalAlign="center" verticalAlign="middle" depth="20"/>
+
+
+		<s:Group id="homeLogo" 
+				 x="{viewCollection.homeLogo.x}" 
+				 y="{viewCollection.homeLogo.y}" 
+				 scaleX="{viewCollection.homeLogo.scale}" 
+				 scaleY="{viewCollection.homeLogo.scale}" 
+				 visible="{viewCollection.homeLogo.visible}" 
+				 alpha="{viewCollection.homeLogo.alpha}"
+				 depth="2">
+			<mx:Image id="homeLogoImage" 
+					  source="{control.teamsModel.homeTeam.logoImage.data}" 
+					  height="400"
+					  smoothBitmapContent="true" scaleContent="true" maintainAspectRatio="true" horizontalAlign="center" verticalAlign="middle"/>
+		</s:Group>
+		
+		
+		<s:Group id="visitorLogo" 
+				 x="{viewCollection.visitorLogo.x}" 
+				 y="{viewCollection.visitorLogo.y}" 
+				 scaleX="{viewCollection.visitorLogo.scale}" 
+				 scaleY="{viewCollection.visitorLogo.scale}" 
+				 visible="{viewCollection.visitorLogo.visible}" 
+				 alpha="{viewCollection.visitorLogo.alpha}"
+				 depth="1">
+			<mx:Image id="VisitorLogoImage" 
+					  source="{control.teamsModel.visitorTeam.logoImage.data}"
+					  height="400"
+					  smoothBitmapContent="true" scaleContent="true" maintainAspectRatio="true" horizontalAlign="center" verticalAlign="middle"/>
+		</s:Group>
+
+
+		<s:Group id="homeScore" x="{viewCollection.homeScore.x}" y="{viewCollection.homeScore.y}" 
+				 scaleX="{viewCollection.homeScore.scale}" scaleY="{viewCollection.homeScore.scale}" 
+				 alpha="{viewCollection.homeScore.alpha}"
+				 visible="{viewCollection.homeScore.visible}" depth="4">
+			<s:BorderContainer styleName="borderContainer" borderColor="{scoreboard.containerBorderColor}"  borderAlpha="{scoreboard.containerBorderAlpha}"
+							   height="113" width="216" >
+				<s:Label styleName="largeLED" text="888" color="{scoreboard.LED_BackColor}" 
+						 width="100%" height="100%" x="-5" y="-4"/>
+				<s:Label styleName="largeLED" id="homeScore_LED" text="{control.scoring.homeTeam.score}" color="{scoreboard.LED_ForeColor}"
+						 width="100%" height="100%" x="-5" y="-4"/>				
+			</s:BorderContainer>
+		</s:Group>
+
+		
+		<s:Group id="secondaryClock" x="{viewCollection.gameClock.x}" y="{viewCollection.gameClock.y}" 
+				 scaleX="{viewCollection.gameClock.scale}" scaleY="{viewCollection.gameClock.scale}" 
+				 alpha="{viewCollection.gameClock.alpha}"
+				 visible="{viewCollection.gameClock.visible}" depth="4">
+			<s:BorderContainer borderColor="{scoreboard.containerBorderColor}"  borderAlpha="{scoreboard.containerBorderAlpha}" backgroundColor="#2d2d2d"
+							   styleName="borderContainer" height="113" width="362" y="25" >
+				<s:Label id="intermissionClockBackground" styleName="clockLED" text="{control.scoring.intermissionClock.displayFormat}" color="{scoreboard.LED_BackColor}"
+						 width="100%" height="76" y="9" textAlign="center"/>
+				<s:Label id="intermissionClock_LED" styleName="clockLED" text="{control.scoring.intermissionClock.formattedTimeRemaining}" color="{scoreboard.LED_ForeColor}"
+						 width="100%" height="76" y="9" textAlign="center"/>
+			</s:BorderContainer>
+			<s:HGroup horizontalAlign="center" width="100%" height="30" y="9" >
+				<s:BorderContainer borderColor="{scoreboard.containerBorderColor}"  borderAlpha="{scoreboard.containerBorderAlpha}" backgroundColor="#2d2d2d"
+								   styleName="borderContainer" width="170" height="30" >
+					<s:Label styleName="clockTitle" text="COUNTDOWN" color="{scoreboard.clockTitlefontColor}" alpha="{scoreboard.clockTitleFontAlpha}" 
+							 width="100%" height="100%" fontSize="20" verticalAlign="middle" textAlign="center" x="0" y="4"/>
+				</s:BorderContainer>						
+			</s:HGroup>
+		</s:Group>
+
+		<s:Group id="visitorScore" x="{viewCollection.visitorScore.x}" y="{viewCollection.visitorScore.y}" 
+				 scaleX="{viewCollection.visitorScore.scale}" scaleY="{viewCollection.visitorScore.scale}" 
+				 alpha="{viewCollection.visitorScore.alpha}"
+				 visible="{viewCollection.visitorScore.visible}" depth="4">
+			<s:BorderContainer styleName="borderContainer" borderColor="{scoreboard.containerBorderColor}"  borderAlpha="{scoreboard.containerBorderAlpha}"
+							   height="113" width="216" >
+				<s:Label styleName="largeLED" text="888" color="{scoreboard.LED_BackColor}" 
+						 width="100%" height="100%" x="-5" y="-4"/>
+				<s:Label styleName="largeLED" id="visitorScore_LED" text="{control.scoring.visitorTeam.score}" color="{scoreboard.LED_ForeColor}"
+						 width="100%" height="100%" x="-5" y="-4"/>				
+			</s:BorderContainer>
+		</s:Group>
+
+		
+	</s:SkinnableContainer>
+
+</s:SkinnableContainer>

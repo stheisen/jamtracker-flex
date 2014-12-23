@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:controls="com.rollerderbyproductions.jamtracker.controls.*"
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 width="400" height="300" 
+		 creationComplete="model.setSelectedDropDownItem(model.ELEMENT_ID_HOMELOGO);">
+	
+	<fx:Style source="com/rollerderbyproductions/jamtracker/skins/dark/SettingsOptions.css" />
+	
+	<fx:Script>
+		<![CDATA[
+			import com.rollerderbyproductions.jamtracker.domain.ViewCollection;
+			import com.rollerderbyproductions.jamtracker.domain.ViewElement;
+			import com.rollerderbyproductions.jamtracker.events.CustomizedViewEvent;
+			import com.rollerderbyproductions.jamtracker.model.ApplicationModel;
+			import com.rollerderbyproductions.jamtracker.model.AssetModel;
+			import com.rollerderbyproductions.jamtracker.presentation.input.CustomizedViewPresentationModel;
+			import com.rollerderbyproductions.jamtracker.presentation.input.SettingsConfigPresentationModel;
+			
+			import mx.controls.Alert;
+			import mx.events.ListEvent;
+			import mx.logging.Log;
+			import mx.logging.ILogger;
+			import mx.utils.StringUtil;
+			
+			import spark.events.IndexChangeEvent;
+			
+			[Bindable][Inject] public var model:CustomizedViewPresentationModel;
+			[Bindable][Inject] public var controller:SettingsConfigPresentationModel;
+			
+			public var viewType:String;
+			
+			private static const _LOG:ILogger = Log.getLogger("CustomizedView");
+			
+			[PostConstruct]
+			public function afterSwizInjection():void{
+				_LOG.debug("PostConstruct");
+				model.setViewCollection(viewType);
+				model.buildDropdownListData();
+			}
+			
+			[EventHandler( event="CustomizedViewEvent.SET_SELECTED_ELEMENT" )]
+			public function setDropDownSelectedIndex(event:CustomizedViewEvent): void{
+				
+				var elementId:String = event.elementId;
+				var nextId:String;
+				
+				for ( var i:Number=0; i<model.dropdownlistArrayCollection.length; i++ ){
+					nextId = model.dropdownlistArrayCollection[i].data;
+					if ( nextId == elementId )  {  
+						elementSelectDropDown.selectedIndex = i;  
+						return;
+					}
+				}
+			}
+
+			
+
+		]]>
+	</fx:Script>
+	
+	<s:VGroup width="100%" height="100%">		
+
+		<s:BorderContainer styleName="panelContainer" width="100%">
+			<s:VGroup width="100%" horizontalAlign="left" verticalAlign="top" paddingTop="5" paddingLeft="5" paddingRight="5">
+				<s:Label width="100%" text="Select/Customize Scoreboard Elements" textAlign="left" styleName="panelContainerTitle" />
+					<s:HGroup width="100%" horizontalAlign="center" verticalAlign="top">
+						
+						<s:VGroup width="35%" horizontalAlign="left" verticalAlign="top">
+							<mx:Form width="100%" styleName="formStyle" paddingTop="5">		
+								<mx:FormItem label="Background Color:" direction="horizontal">
+									<mx:ColorPicker selectedColor="@{model.viewCollection.backgroundColor.color}" click="model.setSelectedDropDownItem(model.ELEMENT_ID_BACKGROUNDCOLOR);" />
+								</mx:FormItem>
+								<mx:FormItem label="Home Logo:" direction="horizontal">
+									<s:CheckBox id="homeLogoCheckBox" selected="@{model.viewCollection.homeLogo.visible}" click="if (homeLogoCheckBox.selected) model.setSelectedDropDownItem(model.ELEMENT_ID_HOMELOGO);" />
+								</mx:FormItem>
+								<mx:FormItem label="Visitor Logo:" direction="horizontal">
+									<s:CheckBox id="visitorLogoCheckBox" selected="@{model.viewCollection.visitorLogo.visible}" click="if (visitorLogoCheckBox.selected) model.setSelectedDropDownItem(model.ELEMENT_ID_VISITORLOGO);"/>
+								</mx:FormItem>								
+								<mx:FormItem label="Home Score:" direction="horizontal">
+									<s:CheckBox id="homeScoreCheckBox" selected="@{model.viewCollection.homeScore.visible}" click="if (homeScoreCheckBox.selected) model.setSelectedDropDownItem(model.ELEMENT_ID_HOMESCORE);"/>
+								</mx:FormItem>
+								<mx:FormItem label="Visitor Score:" direction="horizontal">
+									<s:CheckBox id="visitorScoreCheckBox" selected="@{model.viewCollection.visitorScore.visible}" click="if (visitorScoreCheckBox.selected) model.setSelectedDropDownItem(model.ELEMENT_ID_VISITORSCORE);"/>
+								</mx:FormItem>
+								<mx:FormItem label="Countdown Clock:" direction="horizontal">
+									<s:CheckBox id="countdownClockCheckBox" selected="@{model.viewCollection.gameClock.visible}" click="if (countdownClockCheckBox.selected) model.setSelectedDropDownItem(model.ELEMENT_ID_GAMECLOCK);"/>
+								</mx:FormItem>
+							</mx:Form>
+						</s:VGroup>	
+						
+						<s:VGroup width="65%" horizontalAlign="left" verticalAlign="top">
+							<mx:Form width="100%" styleName="formStyle" paddingTop="5">		
+								<mx:FormItem label="Background Image:" direction="horizontal" horizontalGap="5">
+									<controls:IconButton label="{model.backgroundImageUploadText}" width="120"
+														 iconUp="{AssetModel.ICON_ADDIMAGE16_CLASS}"
+														 click="model.viewImageUpload(model.IMAGE_PREGAME_BACKGROUND);" 
+														 toolTip="Update Scoreboard Background Image"
+														 styleName="iconButton" />
+									<mx:Image source="{AssetModel.ICON_WARNING_CLASS}" visible="{model.displayPregameBackgroundImageSizeWarning}" height="100%" verticalAlign="middle"
+											  toolTip="{ApplicationModel.MESSAGE_PREGAME_IMAGE_EXCEED_MAX_SIZE}" />
+								</mx:FormItem>
+								<mx:FormItem label="Foreground Image:" direction="horizontal" horizontalGap="5">
+									<controls:IconButton label="{model.foregroundImageUploadText}" width="120"
+														 iconUp="{AssetModel.ICON_ADDIMAGE16_CLASS}"
+														 click="model.viewImageUpload(model.IMAGE_PREGAME_FOREGROUND)" 
+														 toolTip="Update Scoreboard Forground Image"
+														 styleName="iconButton" />
+									<mx:Image source="{AssetModel.ICON_WARNING_CLASS}" visible="{model.displayPregameForgroundImageSizeWarning}" height="100%" verticalAlign="middle"
+											  toolTip="{ApplicationModel.MESSAGE_PREGAME_IMAGE_EXCEED_MAX_SIZE}" />
+								</mx:FormItem>
+								<mx:FormItem label="Label 1 Text:" direction="horizontal">
+									<s:TextInput id="viewLabel1" text="@{model.viewCollection.label1.text}" styleName="textInput" 
+												 width="140" maxChars="35" 
+												 focusIn="{controller.suspendKeyboardShortcuts(); model.setSelectedDropDownItem(model.ELEMENT_ID_LABEL1);}" 
+												 focusOut="{controller.resumeKeyboardShortcuts();
+												 model.viewCollection.label1.text = StringUtil.trim(model.viewCollection.label1.text);}" />
+								</mx:FormItem>
+								<mx:FormItem label="Label 2 Text:" direction="horizontal">
+									<s:TextInput id="viewLabel2" text="@{model.viewCollection.label2.text}" styleName="textInput" 
+												 width="140" maxChars="35" 
+												 focusIn="{controller.suspendKeyboardShortcuts(); model.setSelectedDropDownItem(model.ELEMENT_ID_LABEL2);}" 
+												 focusOut="{controller.resumeKeyboardShortcuts();
+												 model.viewCollection.label2.text = StringUtil.trim(model.viewCollection.label2.text);}" />
+								</mx:FormItem>
+								<mx:FormItem label="Label 3 Text:" direction="horizontal">
+									<s:TextInput id="viewLabel3" text="@{model.viewCollection.label3.text}" styleName="textInput" 
+												 width="140" maxChars="35" 
+												 focusIn="{controller.suspendKeyboardShortcuts(); model.setSelectedDropDownItem(model.ELEMENT_ID_LABEL3);}" 
+												 focusOut="{controller.resumeKeyboardShortcuts();
+												 model.viewCollection.label3.text = StringUtil.trim(model.viewCollection.label3.text);}"  />
+								</mx:FormItem>
+								<mx:FormItem label="Label 4 Text:" direction="horizontal">
+									<s:TextInput id="viewLabel4" text="@{model.viewCollection.label4.text}" styleName="textInput" 
+												 width="140" maxChars="35" 
+												 focusIn="{controller.suspendKeyboardShortcuts(); model.setSelectedDropDownItem(model.ELEMENT_ID_LABEL4);}" 
+												 focusOut="{controller.resumeKeyboardShortcuts();
+												 model.viewCollection.label4.text = StringUtil.trim(model.viewCollection.label4.text);}" />
+								</mx:FormItem>								
+							</mx:Form>
+						</s:VGroup>
+					</s:HGroup>
+				</s:VGroup>
+			</s:BorderContainer>
+		
+			<s:BorderContainer styleName="panelContainer" width="100%" height="100%">
+				<s:VGroup paddingTop="5" paddingRight="5" paddingLeft="5" width="100%">
+					<s:Label width="100%" text="Modify Scoreboard Element Properties" textAlign="left" styleName="panelContainerTitle" />
+					<mx:Form id="positioningForm" styleName="formStyle" indicatorGap="5" verticalGap="5" paddingTop="5">
+						
+						<mx:FormItem label="Select an Element:" direction="horizontal" paddingBottom="15">
+							<s:ComboBox id="elementSelectDropDown" width="200"
+										valueCommit="if (model != null) {model.elementSelect_changeHandler(event)}" 
+										change="if (model != null) {model.elementSelect_changeHandler(event)}" 
+										styleName="dropDownList" dataProvider="{model.dropdownlistArrayCollection}" labelField="name">
+							</s:ComboBox>
+						</mx:FormItem>
+						
+						<mx:FormItem label="Visible:" direction="horizontal">
+							<s:CheckBox selected="@{model.selectedViewElement.visible}" enabled="{model.control_visibleAvail}"/>
+						</mx:FormItem>
+
+						<mx:FormItem label="Horizontal Position:" direction="horizontal" >
+							<mx:HSlider minimum="-500" maximum="1524" tickInterval="202.4" liveDragging="true" enabled="{model.control_horizontalAvail}"
+										change="model.changeHorizontalPosition(event, model.selectedViewElement)" width="375" value="{model.selectedViewElement.x}" />
+						</mx:FormItem>
+						
+						<mx:FormItem label="Vertical Position:" direction="horizontal">
+							<mx:HSlider minimum="-500" maximum="1524" tickInterval="202.4" liveDragging="true"  enabled="{model.control_verticalAvail}"
+										change="model.changeVerticalPosition(event, model.selectedViewElement)" width="375" value="{model.selectedViewElement.y}" />
+						</mx:FormItem>
+						
+						<mx:FormItem label="Scale:" direction="horizontal">
+							<mx:HSlider minimum=".1" maximum="7" tickInterval=".69" liveDragging="true" enabled="{model.control_scaleAvail}" 
+										change="if (model != null) {model.changeScale(event, model.selectedViewElement)}" width="375" value="{model.selectedViewElement.scale}" />
+						</mx:FormItem>
+						
+						<mx:FormItem label="Transparancy:" direction="horizontal">
+							<mx:HSlider minimum="0" maximum="1" tickInterval=".1" liveDragging="true" width="375" enabled="{model.control_transparancyAvail}"
+										change="model.changeElementAlpha(event, model.selectedViewElement)" 
+										value="{model.selectedViewElement.alpha}" />
+						</mx:FormItem>
+						
+						<mx:FormItem label="Element Color:" direction="horizontal" visible="{model.control_colorAvail}">
+							<mx:ColorPicker selectedColor="@{model.selectedViewElement.color}" enabled="{model.control_colorAvail}" />
+						</mx:FormItem>
+
+
+					</mx:Form>
+				</s:VGroup> 
+			</s:BorderContainer>
+	</s:VGroup>
+</s:Group>

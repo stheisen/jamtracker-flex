@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:controls="com.rollerderbyproductions.jamtracker.controls.*"
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="400" height="300" 
+		 xmlns:input="com.rollerderbyproductions.jamtracker.views.input.*"
+		 currentState="{model.currentViewState}">
+	
+	<fx:Style source="com/rollerderbyproductions/jamtracker/skins/dark/SettingsOptions.css" />
+	
+	<fx:Script>
+		<![CDATA[
+			import com.rollerderbyproductions.jamtracker.events.ControllerEvent;
+			import com.rollerderbyproductions.jamtracker.model.ApplicationModel;
+			import com.rollerderbyproductions.jamtracker.model.AssetModel;
+			import com.rollerderbyproductions.jamtracker.model.ViewsModel;
+			import com.rollerderbyproductions.jamtracker.presentation.input.CustomizedViewPresentationModel;
+			import com.rollerderbyproductions.jamtracker.presentation.input.ScoreboardViewsPresentationModel;
+			import com.rollerderbyproductions.jamtracker.presentation.input.SettingsConfigPresentationModel;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.events.ListEvent;
+			import mx.utils.StringUtil;
+			
+			import spark.events.IndexChangeEvent;
+			
+			[Bindable][Inject] public var model:ScoreboardViewsPresentationModel;			
+			[Bindable] public var stateCollection:ArrayCollection = new ArrayCollection(["MAIN", "PREGAME", "INTERMISSION", "POSTGAME", "CURTAIN"]);
+
+			
+			/**
+			 * This method listens for and event to set the selected button properly.
+			 * By setting the button selection, the button's chage event is called loading 
+			 * the appropriate view.
+			 */
+			[EventHandler( event="ControllerEvent.SET_CUSTOMVIEW_STATE" )]
+			public function setSelectedButton(event:ControllerEvent):void {
+				switch (event.viewName){
+					case ViewsModel.MAIN_VIEW:
+						buttonBar.selectedIndex = 0;
+						currentState="SCOREBOARD_STATE";
+						break;
+					case ViewsModel.PREGAME_VIEW:
+						buttonBar.selectedIndex = 1;
+						currentState="PREGAME_STATE";
+						break;
+					case ViewsModel.INTERMISSION_VIEW:
+						buttonBar.selectedIndex = 2;
+						currentState="INTERMISSION_STATE";
+						break;
+					case ViewsModel.POSTGAME_VIEW:
+						buttonBar.selectedIndex = 3;
+						currentState="POSTGAME_STATE";
+						break;
+					case ViewsModel.CURTAIN_VIEW:
+						buttonBar.selectedIndex = 4;
+						currentState="CURTAIN_STATE";
+						break;
+					case "RESET_CUSTOM_VIEWS":
+						var getCurrentState:String = currentState;
+						if (currentState != "SCOREBOARD_STATE") {
+							currentState="SCOREBOARD_STATE";
+							currentState=getCurrentState;
+						}
+						break;
+				}
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<s:states>
+		<s:State name="SCOREBOARD_STATE"  />
+		<s:State name="PREGAME_STATE"  />
+		<s:State name="INTERMISSION_STATE"  />
+		<s:State name="POSTGAME_STATE"  />
+		<s:State name="CURTAIN_STATE"  />
+	</s:states>
+	
+	<s:VGroup width="100%" height="100%" horizontalAlign="left">
+		
+		<s:VGroup height="30" width="100%" verticalAlign="middle">
+			<s:HGroup >
+				<s:ButtonBar id="buttonBar"
+							 horizontalCenter="0"
+							 verticalCenter="0"
+							 requireSelection="true"
+							 change="model.btnBar_changeHandler(event)"
+							 dataProvider="{stateCollection}">
+					<s:layout>
+						<s:HorizontalLayout gap="3" columnWidth="105" variableColumnWidth="false"/>
+					</s:layout>
+				</s:ButtonBar>
+				
+			</s:HGroup>
+		</s:VGroup>
+		
+		<s:VGroup width="100%" height="100%" horizontalAlign="left" gap="0">
+			<s:VGroup verticalAlign="top" horizontalAlign="left" height="100%" width="100%" >
+				<s:Group id="viewGroup"  width="100%" height="100%" color="0x323232">
+					
+					<s:HGroup id="main" width="100%" height="100%" includeIn="SCOREBOARD_STATE">
+						<input:ScoreboardConfig width="100%" height="100%"/> 
+					</s:HGroup>
+					
+					<s:HGroup id="pregame" width="100%" height="100%" includeIn="PREGAME_STATE" itemDestructionPolicy="auto">
+						<input:CustomizedView viewType="{ViewsModel.PREGAME_VIEW}" width="100%" height="100%" />
+					</s:HGroup>
+					
+					<s:HGroup id="intermission" width="100%" height="100%" includeIn="INTERMISSION_STATE" itemDestructionPolicy="auto">
+						<input:CustomizedView viewType="{ViewsModel.INTERMISSION_VIEW}" width="100%" height="100%" />
+					</s:HGroup>
+					
+					<s:HGroup id="postgame" width="100%" height="100%" includeIn="POSTGAME_STATE" itemDestructionPolicy="auto">
+						<input:CustomizedView viewType="{ViewsModel.POSTGAME_VIEW}" width="100%" height="100%" />
+					</s:HGroup>
+					
+					<s:HGroup id="curtain" width="100%" height="100%" includeIn="CURTAIN_STATE" itemDestructionPolicy="auto">
+						<input:CustomizedView viewType="{ViewsModel.CURTAIN_VIEW}" width="100%" height="100%" />
+					</s:HGroup>
+					
+				</s:Group>
+			</s:VGroup>
+		</s:VGroup>
+		
+	</s:VGroup>
+	
+</s:Group>

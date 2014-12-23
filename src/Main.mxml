@@ -1,0 +1,232 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					   xmlns:s="library://ns.adobe.com/flex/spark" 
+					   xmlns:mx="library://ns.adobe.com/flex/mx"
+					   xmlns:swiz="http://swiz.swizframework.org"
+					   xmlns:views="com.rollerderbyproductions.jamtracker.views.*"
+					   xmlns:events="com.rollerderbyproductions.jamtracker.events.*"
+					   title="JamTracker - rollerderbyproductions.com"
+					   showStatusBar="false"
+					   width="1020"
+					   height="710"
+					   backgroundColor="0x222222"
+					   currentState="startUp"
+					   visible="false"
+					   resize="calculateScaleSize(event)"
+					   invoke="onInvoke(event)">
+	
+	<fx:Style source="com/rollerderbyproductions/jamtracker/skins/dark/main.css" />
+	
+	<fx:Script>
+		<![CDATA[
+			import air.update.ApplicationUpdaterUI;
+			import air.update.events.UpdateEvent;
+			
+			import com.rollerderbyproductions.jamtracker.model.ApplicationModel;
+			import com.rollerderbyproductions.jamtracker.model.AssetModel;
+			import com.rollerderbyproductions.jamtracker.persistance.PersistanceManager;
+			import com.rollerderbyproductions.jamtracker.util.LoggingConfig;
+			import com.rollerderbyproductions.jamtracker.views.input.ScoreboardControl;
+			
+			import config.Beans;
+			
+			import mx.controls.Alert;
+			import mx.core.FlexGlobals;
+			import mx.events.AIREvent;
+			import mx.events.CloseEvent;
+			import mx.events.FlexEvent;
+			import mx.logging.ILogger;
+			import mx.logging.Log;
+						
+			[Inject] public var persistanceManager:PersistanceManager;
+			[Bindable][Inject] public var applicationModel:ApplicationModel;	
+			
+			[Bindable] public var guiScaleSize:Number = 1; 
+
+			private var _LOG:ILogger = Log.getLogger("PersistanceManager"); 
+
+			private const LOAD_DELAY:int = 0;  // The "built in" delay for the splash screen. This does not include any effect delays
+
+			private var _appUpdater:ApplicationUpdaterUI = new ApplicationUpdaterUI();
+			private var _timeElapsed:int = 0;
+			private var _loadTimer:Timer;
+			// These are set by command line values
+			private var _specified_xPos:Number = -9999;
+			private var _specified_yPos:Number = -9999;
+			private var _specified_onTop:Boolean = true;
+			private var _specified_startMinimized:Boolean = false;
+			
+			private var _nativeWidth:Number = 1020;
+			private var _nativeHeight:Number = 710;
+			
+			/**
+			 * This will calcualte the appropriate scaling to the current window size.
+			 */
+			public function calculateScaleSize(event:Event):void {
+				// scale the content to fit the window based on the design size, maintaining height/width scale
+				var guiHeight:Number = this.height;
+				var guiWidth:Number = 0;
+				var count:Number = 0;
+				
+				// Try and make sure the calucalated width is not larger than the window size.
+				do
+				{
+					count = count + 1;
+					guiScaleSize = guiHeight / (_nativeHeight);
+					guiWidth =  _nativeWidth * guiScaleSize;
+					guiHeight = guiHeight - 1;
+				} while (guiWidth > this.width && count < 10);
+				
+			}
+			
+			
+			/**
+			 * This method is called when the application is invoked.
+			 * This allows us to process command line variables that are provided.
+			 * 
+			 * NOTE: This window is hidden until the end of this routine.
+			 */
+			protected function onInvoke(event:InvokeEvent):void {
+				
+				// Process any provided commandline arguments				
+				var cmdLineArguments:Array = event.arguments.toString().split(",");
+				for (var i:int = 0; i < cmdLineArguments.length; i++) {
+					var optionParameter:Array = cmdLineArguments[i].split("=");
+					try {
+						switch (optionParameter[0].toString().toUpperCase()){
+							// Opening x position
+							case "XPOS":
+								if (! isNaN(parseInt(optionParameter[1]))) _specified_xPos = parseInt(optionParameter[1]) else throw new Error(); 
+								break;
+							// Opening y position
+							case "YPOS":
+								if (! isNaN(parseInt(optionParameter[1]))) _specified_yPos = parseInt(optionParameter[1]) else throw new Error(); 
+								break;
+							// Disable the force to front
+							case "STARTMINIMIZED":
+								_specified_startMinimized = true;
+								break;
+							// Disable the force to front
+							case "NOTONTOP":
+								_specified_onTop = false;
+								break;
+							case "":
+								_LOG.debug("No Commandline Arguments");
+								break;
+							default:
+								throw new Error();
+						}
+					} catch (e:Error) {
+						_LOG.debug("Invalid commandline argument: ["+cmdLineArguments[i]+"]");
+					}
+				}
+				
+				// If a x or y position for this window was provided on the command line, then position as requested,
+				// otherwise center the window on the main screen.
+				if (_specified_xPos != -9999) nativeWindow.x = _specified_xPos else nativeWindow.x = (Capabilities.screenResolutionX - nativeWindow.bounds.width) / 2;
+				if (_specified_yPos != -9999) nativeWindow.y = _specified_yPos else nativeWindow.y = (Capabilities.screenResolutionY - nativeWindow.bounds.height) / 2;
+				// Bring the app window to the front				
+				if (_specified_onTop){ nativeWindow.orderToFront(); }
+				// Should the application start minimized?
+				if (_specified_startMinimized) this.minimize();
+
+				// Add listener for native window events
+				nativeWindow.addEventListener(Event.CLOSING, onWindowClosing, false, 0, true); 
+				nativeWindow.addEventListener(NativeWindowDisplayStateEvent.DISPLAY_STATE_CHANGE, calculateScaleSize, false, 0, true);
+				
+				// Start the loading delay timer
+				initializeSplashTimer();
+				
+				// If the screen height or width is less than 1024x760, then fullscreen and scale to the resolution
+				if ((Screen.mainScreen.bounds.height <= 768) || (Screen.mainScreen.bounds.width <= 1024)){ this.maximize(); }
+				
+				// Finally make the window (application) visasble now.
+				this.visible = true;
+								
+			}
+			
+					
+			/**
+			 * Initialize a timer that creates a delay for the splash screen
+			 */
+			private function initializeSplashTimer():void {
+				// start the timer, which simulates a loading delay.
+				_loadTimer = new Timer(1000);
+				_loadTimer.addEventListener(TimerEvent.TIMER, onTick, false, 0, true);
+				_loadTimer.start();
+			}
+			
+			/**
+			 * Look at the timer each time it ticks. Once it expires, we will stop the timer
+			 * and reset the view state.
+			 */
+			private function onTick(event:TimerEvent):void {
+				_timeElapsed++;
+				// if the loading delay has passed, stop the timer, and change the viewstate 
+				if ((LOAD_DELAY - _timeElapsed) <= 0)
+				{
+					_loadTimer.stop();
+					_loadTimer.removeEventListener(TimerEvent.TIMER, onTick);
+					_loadTimer = null;
+					// Change the viewstate to remove the splashScreen, and set focus in the scoreboard control
+					mainAppContainer.addElement(mainView);
+					mainView.scoreboardControl.setFocus();
+				}
+			}
+
+			/**
+			 * interrupt the close event for the application, and ask the user to confirm they are done with the application
+			 */ 
+			private function onWindowClosing( event:Event ):void {
+				event.preventDefault();  
+				Alert.show("Do you wish to exit "+applicationModel.applicationName+"?", "Confirm Exit", Alert.OK | Alert.CANCEL, null, confirmCloseApplicationHandler, AssetModel.ICON_ALERT32_CLASS, Alert.CANCEL, null);
+			}
+			
+			/**
+			 * This checks the reseponse to the Alert confirmation box presented to the user and either closes the application
+			 * and ALL other active windows or simply returns the user to the application (Cancel)
+			 */
+			public function confirmCloseApplicationHandler(event:CloseEvent):void {
+				// If the user confirmed the closing of the main window
+				if(event.detail==Alert.OK) {
+					// Then save the current state of the scoreboard
+					persistanceManager.saveCurrentState();
+					// Loop through and close any open windows.
+					for ( var i:int = NativeApplication.nativeApplication.openedWindows.length - 1; i >= 0; --i ) {	
+						nativeWindow.removeEventListener(Event.CLOSING, onWindowClosing);
+						NativeWindow( NativeApplication.nativeApplication.openedWindows[i] ).close();
+					}
+				}
+				_LOG.debug("---------------  Exit Jamtracker Gracefully  ---------------");
+
+			}
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		<swiz:SwizConfig id="mySwizConfig" strict="true"
+						 eventPackages="com.rollerderbyproductions.jamtracker.events.*"
+						 viewPackages="com.rollerderbyproductions.jamtracker.views.*"/>
+		<swiz:Swiz id="mySwiz" beanProviders="{[Beans]}" config="{mySwizConfig}" />		
+	</fx:Declarations>
+	
+	<s:states>
+		<s:State name="mainView"  />
+		<s:State name="startUp" />
+	</s:states>
+	
+	<s:transitions>
+		<s:Transition toState="mainView">
+			<s:Parallel>
+				<s:Fade duration="1000" target="{splashBox}" alphaFrom="1" alphaTo="0"/>
+				<s:Fade duration="1000" target="{mainView}" alphaFrom="0" alphaTo="1"/>
+			</s:Parallel>
+		</s:Transition>
+	</s:transitions>	
+
+	<s:Group id="mainAppContainer" horizontalCenter="0" verticalCenter="0" height="100%" scaleX="{guiScaleSize}" scaleY="{guiScaleSize}">
+		<views:Splash id="splashBox" includeIn="startUp"  />
+		<views:MainView id="mainView" includeIn="mainView" itemCreationPolicy="immediate" creationComplete="currentState='mainView';" />
+	</s:Group>		
+	
+</s:WindowedApplication>

@@ -1,0 +1,495 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 xmlns:controls="com.rollerderbyproductions.jamtracker.controls.*"
+		 width="421"
+		 currentState="{model.currentControlViewState}"
+		 creationComplete="model.initalizeController()">
+	
+	<fx:Style source="com/rollerderbyproductions/jamtracker/skins/dark/scoreboardControl.css" />
+	
+	<fx:Script>
+		<![CDATA[
+			import com.rollerderbyproductions.jamtracker.model.AssetModel;
+			import com.rollerderbyproductions.jamtracker.model.ScoringModel;
+			import com.rollerderbyproductions.jamtracker.model.TeamsModel;
+			import com.rollerderbyproductions.jamtracker.presentation.input.ScoreboardControlPresentationModel;
+			import com.rollerderbyproductions.jamtracker.presentation.input.ViewControlPresentationModel;
+			import com.rollerderbyproductions.jamtracker.skins.dark.IconButtonSkin;
+			
+			import mx.binding.utils.ChangeWatcher;
+			import mx.controls.Alert;
+			import mx.core.FlexGlobals;
+			import mx.events.FlexEvent;
+			
+			import spark.events.TextOperationEvent;
+			
+			[Inject][Bindable] public var model:ScoreboardControlPresentationModel;
+			[Inject] public var viewControl:ViewControlPresentationModel;
+
+			
+			protected function enterHandler(event:Event):void
+			{
+				clockGroup.setFocus();
+			}
+			
+			protected function gameClockValue_changeHandler(event:Event):void
+			{
+				model.validateRemainingTimeValue(model.scoring.gameClock, gameClockValue.text, true, true);
+				gameClockValue.text=model.scoring.gameClock.formattedTimeRemaining;
+			}
+
+			protected function jamClockValue_changeHandler(event:Event):void
+			{
+				model.validateRemainingTimeValue(model.scoring.jamClock, jamClockValue.text, true);
+				jamClockValue.text=model.scoring.jamClock.formattedTimeRemaining;
+			}
+
+			protected function breakClockValue_changeHandler(event:Event):void
+			{
+				model.validateRemainingTimeValue(model.scoring.breakClock, breakClockValue.text);
+				breakClockValue.text=model.scoring.breakClock.formattedTimeRemaining;
+			}
+
+			protected function timeoutClockValue_changeHandler(event:Event):void
+			{
+				model.validateRemainingTimeValue(model.scoring.timeoutClock, timeoutClockValue.text);
+				timeoutClockValue.text=model.scoring.timeoutClock.formattedTimeRemaining;
+			}
+
+			protected function intermissionClockValue_changeHandler(event:Event):void
+			{
+				model.validateRemainingTimeValue(model.scoring.intermissionClock, intermissionClockValue.text);
+				intermissionClockValue.text=model.scoring.intermissionClock.formattedTimeRemaining;
+			}
+
+			protected function home_pointsThisJam_focusOutHandler(event:FocusEvent):void
+			{
+				model.currentJamScoreSet(parseInt(home_pointsThisJam.text),TeamsModel.HOME_TEAM);
+				model.enableKeyboardShortcuts();
+				home_pointsThisJam.text=model.scoring.homeTeam.pointsThisJam.toString();
+			}
+						
+			protected function home_timeoutsCorrection_focusOutHandler(event:FocusEvent):void
+			{
+				model.actionTimeoutsLeftSet(parseInt(home_timeoutsCorrection.text),TeamsModel.HOME_TEAM);
+				model.enableKeyboardShortcuts();
+				home_timeoutsCorrection.text=model.scoring.homeTeam.timeoutsLeft.toString();
+			}
+
+			protected function home_teamScoreCorrection_focusOutHandler(event:FocusEvent):void
+			{
+				model.actionTeamScoreSet(parseInt(home_teamScoreCorrection.text),TeamsModel.HOME_TEAM);
+				model.enableKeyboardShortcuts();
+				home_teamScoreCorrection.text=model.scoring.homeTeam.score.toString();
+			}
+
+
+			protected function home_totalJamsLeadCorrection_focusOutHandler(event:FocusEvent):void
+			{
+				model.actionTotalJamsLeadSet(parseInt(home_totalJamsLeadCorrection.text),TeamsModel.HOME_TEAM);
+				model.enableKeyboardShortcuts();
+				home_totalJamsLeadCorrection.text=model.scoring.homeTeam.jamsLead.toString();
+			}
+
+
+			protected function home_previousJamPtsCorrection_focusOutHandler(event:FocusEvent):void
+			{
+				model.actionPreviousJamScoreSet(parseInt(home_previousJamPtsCorrection.text),TeamsModel.HOME_TEAM);
+				model.enableKeyboardShortcuts();
+				home_previousJamPtsCorrection.text=model.scoring.homeTeam.pointsPreviousJam.toString();
+			}
+
+			protected function visitor_pointsThisJam_focusOutHandler(event:FocusEvent):void
+			{
+				model.currentJamScoreSet(parseInt(visitor_pointsThisJam.text),TeamsModel.VISITING_TEAM);
+				model.enableKeyboardShortcuts();
+				visitor_pointsThisJam.text=model.scoring.visitorTeam.pointsThisJam.toString();
+			}
+			
+			protected function visitor_timeoutsCorrection_focusOutHandler(event:FocusEvent):void
+			{
+				model.actionTimeoutsLeftSet(parseInt(visitor_timeoutsCorrection.text),TeamsModel.VISITING_TEAM);
+				model.enableKeyboardShortcuts();
+				visitor_timeoutsCorrection.text=model.scoring.visitorTeam.timeoutsLeft.toString();
+			}
+			
+			protected function visitor_teamScoreCorrection_focusOutHandler(event:FocusEvent):void
+			{
+				model.actionTeamScoreSet(parseInt(visitor_teamScoreCorrection.text),TeamsModel.VISITING_TEAM);
+				model.enableKeyboardShortcuts();
+				visitor_teamScoreCorrection.text=model.scoring.visitorTeam.score.toString();
+			}
+			
+			
+			protected function visitor_totalJamsLeadCorrection_focusOutHandler(event:FocusEvent):void
+			{
+				model.actionTotalJamsLeadSet(parseInt(visitor_totalJamsLeadCorrection.text),TeamsModel.VISITING_TEAM);
+				model.enableKeyboardShortcuts();
+				visitor_totalJamsLeadCorrection.text=model.scoring.visitorTeam.jamsLead.toString();
+			}
+			
+			
+			protected function visitor_previousJamPtsCorrection_focusOutHandler(event:FocusEvent):void
+			{
+				model.actionPreviousJamScoreSet(parseInt(visitor_previousJamPtsCorrection.text),TeamsModel.VISITING_TEAM);
+				model.enableKeyboardShortcuts();
+				visitor_previousJamPtsCorrection.text=model.scoring.visitorTeam.pointsPreviousJam.toString();
+			}
+			
+
+		]]>
+	</fx:Script>
+	
+	<s:states>
+		<s:State name="scoring" />
+		<s:State name="corrections" />
+	</s:states> 
+	
+	<s:BorderContainer styleName="panelContainer" id="controllerContainer" width="100%" height="100%">
+		<s:VGroup width="100%" height="100%" horizontalAlign="center" verticalAlign="middle" paddingLeft="5" paddingRight="5">
+	
+			<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ CLOCKS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->	
+			<s:HGroup id="clockGroup" width="100%" height="100%" gap="5" horizontalAlign="center" verticalAlign="middle" paddingTop="9">
+				
+				<s:HGroup width="10%" horizontalAlign="left" paddingTop="9" paddingLeft="3">
+					<controls:IconToggleButton iconUp="{AssetModel.ICON_GIRL16_CLASS}" 
+											   iconDown="{AssetModel.ICON_GIRLINACTIVE16_CLASS}" 
+											   toolTip="Toggle Jammer Image Visibility" 
+											   styleName="centeredIconToggleButton" 
+											   selected="{model.scoreboard.hideJammerImageArea}"
+											   enabled="{model.scoreboard.setJammerImageHeight > 0}"
+											   click="{viewControl.toggleJammerImage_ClickHandler(event)}" width="22"/>
+				</s:HGroup>
+				
+				<s:HGroup width="90%" horizontalAlign="right">
+					<s:VGroup horizontalAlign="center" gap="0">
+						<s:Label styleName="clockLabel" text="PERIOD" />
+						<s:TextInput styleName="clockTextInput" id="gameClockValue" width="60" text="{model.scoring.gameClock.formattedTimeRemaining}" enabled="{! model.scoring.gameClock.isActive}" restrict="0-9 :" 
+									 focusIn="model.disableKeyboardShortcuts();"
+									 focusOut="gameClockValue_changeHandler(event);"
+									 enter="enterHandler(event);"/>
+					</s:VGroup>
+					<s:VGroup horizontalAlign="center" gap="0">
+						<s:Label styleName="clockLabel" text="JAM" />
+						<s:TextInput styleName="clockTextInput" id="jamClockValue" width="60" text="{model.scoring.jamClock.formattedTimeRemaining}" enabled="{! model.scoring.jamClock.isActive}" restrict="0-9 :" 
+									 focusIn="model.disableKeyboardShortcuts();"
+									 focusOut="jamClockValue_changeHandler(event);"
+									 enter="enterHandler(event);"/>
+					</s:VGroup>
+					<s:VGroup horizontalAlign="center" gap="0">
+						<s:Label styleName="clockLabel" text="LINEUP" />
+						<s:TextInput styleName="clockTextInput" id="breakClockValue"  width="60" text="{model.scoring.breakClock.formattedTimeRemaining}" enabled="{! model.scoring.breakClock.isActive}" restrict="0-9 :" 
+									 focusIn="model.disableKeyboardShortcuts();" 
+									 focusOut="breakClockValue_changeHandler(event);"
+									 enter="enterHandler(event);"/>
+					</s:VGroup>
+					<s:VGroup horizontalAlign="center" gap="0">
+						<s:Label styleName="clockLabel" text="TIMEOUT" />
+						<s:TextInput styleName="clockTextInput" id="timeoutClockValue" width="60" text="{model.scoring.timeoutClock.formattedTimeRemaining}" enabled="{! model.scoring.timeoutClock.isActive}" restrict="0-9 :"
+									 focusIn="model.disableKeyboardShortcuts();" 
+									 focusOut="timeoutClockValue_changeHandler(event);"
+									 enter="enterHandler(event);"/>
+					</s:VGroup>
+					<s:VGroup horizontalAlign="center" gap="0">
+						<s:Label styleName="clockLabel" text="COUNT/INT" />
+						<s:TextInput styleName="clockTextInput" id="intermissionClockValue" width="60" text="{model.scoring.intermissionClock.formattedTimeRemaining}" enabled="{! model.scoring.intermissionClock.isActive}" restrict="0-9 :"
+									 focusIn="model.disableKeyboardShortcuts();" 
+									 focusOut="intermissionClockValue_changeHandler(event);"
+									 enter="enterHandler(event);"/>
+					</s:VGroup>					
+				</s:HGroup>
+				<s:HGroup width="10%" horizontalAlign="right" paddingTop="9" paddingRight="3">
+					<controls:IconToggleButton iconUp="{AssetModel.ICON_CORRECTIONS_CLASS}" iconDown="{AssetModel.ICON_CORRECTIONSDISABLED_CLASS}" selected="{currentState == 'corrections'}" toolTip="Toggle Scoring Adjustments" styleName="centeredIconToggleButton" 
+					 						   click="model.toggleViewState()" width="22"/>
+				</s:HGroup>
+			</s:HGroup>
+			
+			<mx:HRule strokeWidth="2" strokeColor="0x222222" shadowColor="0x515151" width="100%" />
+				
+			<s:HGroup width="100%" gap="0" paddingLeft="3" paddingRight="3"> 
+				<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ HOME SCORE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->	
+				<s:BorderContainer id="homeBorderContainer" width="114" height="100%"
+								   backgroundColor="{model.teamsModel.homeTeam.controllerBackgroundColor}" backgroundAlpha="{model.teamsModel.homeTeam.controllerBackgroundAlpha}" >
+					<s:VGroup height="100%" width="100%" horizontalAlign="center" paddingTop="3" paddingBottom="5" gap="0" includeIn="scoring">
+						<s:Label id="homeTeamName" width="100%" text="{model.teamsModel.homeTeam.shortName}" styleName="teamName" textAlign="center" maxDisplayedLines="1"/>
+						<s:Label width="100%" text="TIMEOUTS" textAlign="center" paddingTop="3" styleName="smallText"/>
+						<s:HGroup verticalAlign="middle" paddingBottom="3">						
+							<s:Label styleName="teamTimeouts" id="homeTimeouts" text="{model.scoring.homeTeam.timeoutsLeft}" paddingTop="5"
+									 fontSize="15" fontWeight="bold" width="100%" textAlign="center"/>
+						</s:HGroup>
+						<s:Button label="TIMEOUT" width="105" click="model.actionTeamTimoutStart(TeamsModel.HOME_TEAM)" enabled="{model.buttonActive_homeTimeout}" styleName="panelButton" toolTip="{model.teamsModel.homeTeam.shortName} {model.TOOLTIP_HOMETIMEOUT}"/>
+						<s:Label styleName="teamScore" id="homeScore" text="{model.scoring.homeTeam.score}" 
+								 fontSize="26" fontWeight="bold" width="100%" paddingTop="5" paddingBottom="5" textAlign="center"/>
+						<s:Label width="100%" text="{model.labelJamPointsType}" textAlign="center" styleName="smallText"/>
+						<s:HGroup verticalAlign="middle" paddingBottom="3" enabled="{model.actionActive_modifyJamScore}">
+							<controls:IconButton iconUp="{AssetModel.ICON_ARROWLEFT_CLASS}" toolTip="{model.TOOLTIP_HOMEJAMSCORE_DECREMENT}" styleName="centeredIconButton" width="16"
+												 click="model.actionHandler_adjustCurrentJamScore(-1,TeamsModel.HOME_TEAM, ScoringModel.INCREMENT)"/> 
+							<s:TextInput id="home_pointsThisJam" styleName="scoringTextInput" width="36" text="{model.scoring.homeTeam.pointsThisJam}" maxChars="2"
+										 focusIn="model.disableKeyboardShortcuts();" 
+										 focusOut="home_pointsThisJam_focusOutHandler(event);"
+										 enter="enterHandler(event);"/>
+							<controls:IconButton iconUp="{AssetModel.ICON_ARROWRIGHT_CLASS}" toolTip="{model.TOOLTIP_HOMEJAMSCORE_INCREMENT}" styleName="centeredIconButton" width="16"											 
+												 click="model.actionHandler_adjustCurrentJamScore(1,TeamsModel.HOME_TEAM, ScoringModel.INCREMENT)"/> 
+						</s:HGroup>
+						<s:HGroup verticalAlign="middle" paddingBottom="3" enabled="{model.actionActive_modifyJamScore}" gap="8">
+							<s:Button label="+4" width="36" click="model.actionHandler_adjustCurrentJamScore(4,TeamsModel.HOME_TEAM, ScoringModel.INCREMENT)" toolTip="{model.TOOLTIP_HOMEJAMSCORE_INCREMENT4}"/>
+							<s:Button label="+5" width="36" click="model.actionHandler_adjustCurrentJamScore(5,TeamsModel.HOME_TEAM, ScoringModel.INCREMENT)" toolTip="{model.TOOLTIP_HOMEJAMSCORE_INCREMENT5}"/>
+						</s:HGroup>	
+						<s:Button label="{model.buttonText_homeLeadJamToggle}" width="105" enabled="{model.buttonActive_homeLeadJammer}" 
+								  styleName="panelButton" click="model.actionHandler_leadJammer(TeamsModel.HOME_TEAM)" toolTip="{model.teamsModel.homeTeam.shortName} {model.TOOLTIP_HOMELEADJAMMER}"/>
+					</s:VGroup>
+					
+					<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~ SCORING CORRECTIONS ~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+					<s:VGroup height="100%" width="100%" horizontalAlign="center" paddingTop="3" paddingBottom="5" gap="0" includeIn="corrections">
+						<s:Label width="100%" text="{model.teamsModel.homeTeam.shortName}" styleName="teamName" textAlign="center" maxDisplayedLines="1"/>
+						<s:Label width="100%" text="TIMEOUTS" textAlign="center" paddingTop="10" styleName="smallText"/>
+						<s:HGroup verticalAlign="middle" paddingBottom="8">						
+							<controls:IconButton iconUp="{AssetModel.ICON_ARROWLEFT_CLASS}" toolTip="Decrement Timeouts Remaining" styleName="centeredIconButton" width="16"
+												 click="model.actionTimeoutsLeftChange(-1,TeamsModel.HOME_TEAM)" /> 
+							<s:TextInput id="home_timeoutsCorrection" styleName="scoringTextInput" width="40" text="{model.scoring.homeTeam.timeoutsLeft}" maxChars="1" restrict="0-9"
+										 focusIn="model.disableKeyboardShortcuts();" 
+										 focusOut="home_timeoutsCorrection_focusOutHandler(event);"
+										 enter="enterHandler(event);"/>
+							<controls:IconButton iconUp="{AssetModel.ICON_ARROWRIGHT_CLASS}" toolTip="Increment Timeouts Remaining" styleName="centeredIconButton" width="16"											 
+												 click="model.actionTimeoutsLeftChange(1,TeamsModel.HOME_TEAM)" /> 
+						</s:HGroup>
+
+						<s:Label width="100%" text="TOTAL SCORE" textAlign="center" styleName="smallText"/>
+						<s:HGroup verticalAlign="middle" paddingBottom="8">						
+							<controls:IconButton iconUp="{AssetModel.ICON_ARROWLEFT_CLASS}" toolTip="Decrement Total Score" styleName="centeredIconButton" width="16"
+												 click="model.actionTeamScoreChange(-1,TeamsModel.HOME_TEAM);"/> 
+							<s:TextInput id="home_teamScoreCorrection" styleName="scoringTextInput" width="40" text="{model.scoring.homeTeam.score}" maxChars="3" restrict="0-9"
+										 focusIn="model.disableKeyboardShortcuts();"
+										 focusOut="home_teamScoreCorrection_focusOutHandler(event);"
+										 enter="enterHandler(event);"/>
+							<controls:IconButton iconUp="{AssetModel.ICON_ARROWRIGHT_CLASS}" toolTip="Increment Total Score" styleName="centeredIconButton" width="16"											 
+												 click="model.actionTeamScoreChange(1,TeamsModel.HOME_TEAM);"/> 
+						</s:HGroup>
+						
+						<s:Label width="100%" text="PTS PREV JAM" textAlign="center" styleName="smallText"/>
+						<s:HGroup verticalAlign="middle" paddingBottom="8" enabled="{model.firstJamEnded}">
+							<controls:IconButton iconUp="{AssetModel.ICON_ARROWLEFT_CLASS}" toolTip="Decrement Previous Jam Points" styleName="centeredIconButton" width="16"
+												 click="model.actionPreviousJamScoreChange(-1,TeamsModel.HOME_TEAM);"/> 
+							<s:TextInput id="home_previousJamPtsCorrection" styleName="scoringTextInput" width="40" text="{model.scoring.homeTeam.pointsPreviousJam}" maxChars="2" restrict="0-9"
+										 focusIn="model.disableKeyboardShortcuts();" 
+										 focusOut="home_previousJamPtsCorrection_focusOutHandler(event);"
+										 enter="enterHandler(event);"/>
+							<controls:IconButton iconUp="{AssetModel.ICON_ARROWRIGHT_CLASS}" toolTip="Increment Previous Jam Points" styleName="centeredIconButton" width="16"											 
+												 click="model.actionPreviousJamScoreChange(1,TeamsModel.HOME_TEAM);"/> 
+						</s:HGroup>
+
+						<s:Label width="100%" text="TOTAL JAMS LEAD" textAlign="center" styleName="smallText"/>
+						<s:HGroup verticalAlign="middle" paddingBottom="8">
+							<controls:IconButton iconUp="{AssetModel.ICON_ARROWLEFT_CLASS}" toolTip="Decrement Total Jams Lead" styleName="centeredIconButton" width="16"
+												 click="model.actionTotalJamsLeadChange(-1,TeamsModel.HOME_TEAM);"/> 
+							<s:TextInput id="home_totalJamsLeadCorrection" styleName="scoringTextInput" width="40" text="{model.scoring.homeTeam.jamsLead}" maxChars="2" restrict="0-9"
+										 focusIn="model.disableKeyboardShortcuts();" 
+										 focusOut="home_totalJamsLeadCorrection_focusOutHandler(event);"
+										 enter="enterHandler(event);"/>
+							<controls:IconButton iconUp="{AssetModel.ICON_ARROWRIGHT_CLASS}" toolTip="Increment Total Jams Lead" styleName="centeredIconButton" width="16"											 
+												 click="model.actionTotalJamsLeadChange(1,TeamsModel.HOME_TEAM);"/> 
+						</s:HGroup>
+					</s:VGroup>
+					
+				</s:BorderContainer>
+				<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ CENTER CONTROLS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->	
+				<s:VGroup width="176" height="100%" horizontalAlign="center">
+					<s:HGroup>
+						<s:VGroup width="100%" horizontalAlign="center" paddingTop="0">
+							<s:BorderContainer width="75" height="46" borderColor="0x222222" backgroundAlpha="0">
+								<s:VGroup horizontalAlign="center" gap="0" width="100%" height="100%" >
+									<s:Label styleName="periodLabel" text="PERIOD" paddingTop="5"/>
+									<s:HGroup verticalAlign="middle">
+										<controls:IconButton iconUp="{AssetModel.ICON_ARROWLEFT_CLASS}" toolTip="Decrease" styleName="centeredIconButton" width="16"
+															 click="model.periodNumberChange(-1)" includeIn="corrections"/> 
+										<s:Label text="{model.scoring.currentPeriodNumber}"
+												 fontWeight="bold" fontSize="20" paddingTop="7" />
+										<controls:IconButton iconUp="{AssetModel.ICON_ARROWRIGHT_CLASS}" toolTip="Increase" styleName="centeredIconButton" width="16"											 
+															 click="model.periodNumberChange(1)" includeIn="corrections"/> 
+									</s:HGroup>
+								</s:VGroup>
+							</s:BorderContainer>
+						</s:VGroup>
+						<s:VGroup width="100%" horizontalAlign="center" paddingTop="0">
+							<s:BorderContainer width="75" height="46" borderColor="0x222222" backgroundAlpha="0">
+								<s:VGroup horizontalAlign="center" gap="0" width="100%" height="100%" >
+									<s:Label styleName="periodLabel" text="JAM" paddingTop="5"/>
+									<s:HGroup verticalAlign="middle">
+										<controls:IconButton iconUp="{AssetModel.ICON_ARROWLEFT_CLASS}" toolTip="Decrease" styleName="centeredIconButton" width="16"
+															 click="model.jamNumberChange(-1)" includeIn="corrections"/> 
+										<s:Label text="{model.scoring.currentJamNumber}"
+												 fontWeight="bold" fontSize="20" paddingTop="7" />
+										<controls:IconButton iconUp="{AssetModel.ICON_ARROWRIGHT_CLASS}" toolTip="Increase" styleName="centeredIconButton" width="16"											 
+															 click="model.jamNumberChange(1)" includeIn="corrections"/> 
+									</s:HGroup>
+								</s:VGroup>
+							</s:BorderContainer>
+						</s:VGroup>
+					</s:HGroup>
+					
+					<s:VGroup width="100%" horizontalAlign="center" paddingTop="0" includeIn="scoring">
+						<s:Button label="{model.buttonText_officialTimeoutToggle}" width="140"
+								  click="model.actionHandler_officialTimeout()" 
+								  enabled="{model.buttonActive_officialTimeout}"
+								  toolTip="{model.TOOLTIP_OFFICIALTIMEOUT}"
+								  styleName="panelButton"/>
+						<s:HGroup verticalAlign="middle" paddingTop="5">
+							<s:Label text="{model.scoring.homeTeam.pointsPreviousJam}" textAlign="right" width="25" fontWeight="bold"/>
+							<s:Label text="- Points Prev Jam -" textAlign="center" width="110"/>
+							<s:Label text="{model.scoring.visitorTeam.pointsPreviousJam}" textAlign="left" width="25" fontWeight="bold"/>
+						</s:HGroup>
+						<s:HGroup verticalAlign="middle" paddingBottom="48">
+							<s:Label text="{model.scoring.homeTeam.jamsLead}" textAlign="right" width="25" fontWeight="bold"/>
+							<s:Label text="- Total Jams Lead -" textAlign="center" width="110"/>
+							<s:Label text="{model.scoring.visitorTeam.jamsLead}" textAlign="left" width="25" fontWeight="bold"/>
+						</s:HGroup>
+						<s:Button label="{model.buttonText_noLeadJammer}" enabled="{model.buttonActive_noLeadJammer}" width="140"
+								  click="model.actionHandler_noLeadLostLeadJammer()" styleName="panelButton" toolTip="{model.TOOLTIP_NOLEADJAMMER}"/>
+					</s:VGroup>
+
+					<s:VGroup width="100%" horizontalAlign="center" paddingTop="7" includeIn="corrections">
+						
+						<s:BorderContainer width="155" height="80" styleName="warningBorderContainer">
+							<s:VGroup width="100%" paddingBottom="5" paddingLeft="5" paddingTop="5" paddingRight="5">
+								<s:HGroup width="100%" horizontalAlign="center" verticalAlign="middle">
+									<mx:Image source="{AssetModel.ICON_WARNING_CLASS}" />
+									<s:Label text="NOTICE" fontSize="16" fontWeight="bold" />
+								</s:HGroup>
+								<s:Label text="All adjustments will be applied immediatly to the main scoreboard. Click FINISHED to return to the scoring view." 
+										 fontSize="10" textAlign="justify" lineBreak="toFit" width="100%"/>								
+							</s:VGroup>
+						</s:BorderContainer>
+						<s:VGroup width="100%" paddingTop="12" horizontalAlign="center">
+							<controls:IconButton label="FINISHED" width="96"
+									  iconUp="{AssetModel.ICON_CONFIRM16_CLASS}"
+									  click="model.toggleViewState()" 
+									  toolTip="Return to the scoring controller"
+									  styleName="iconButton" />
+						</s:VGroup>
+					</s:VGroup>
+
+					
+				</s:VGroup>
+				
+				<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ VISITOR SCORE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->	
+				<s:BorderContainer id="visitorBorderContainer" width="114" height="100%"
+								   backgroundColor="{model.teamsModel.visitorTeam.controllerBackgroundColor}" backgroundAlpha="{model.teamsModel.visitorTeam.controllerBackgroundAlpha}">
+					
+					<s:VGroup height="100%" width="100%" horizontalAlign="center" paddingTop="3" paddingBottom="5" gap="0" includeIn="scoring">
+						<s:Label id="visitorTeamName" width="100%" text="{model.teamsModel.visitorTeam.shortName}" styleName="teamName" textAlign="center" maxDisplayedLines="1"/>
+						<s:Label width="100%" text="TIMEOUTS" textAlign="center" paddingTop="3" styleName="smallText"/>
+						<s:HGroup verticalAlign="middle" paddingBottom="3">						
+							<s:Label styleName="teamTimeouts" id="visitorTimeouts" text="{model.scoring.visitorTeam.timeoutsLeft}" paddingTop="5"
+									 fontSize="15" fontWeight="bold" width="100%" textAlign="center"/>
+						</s:HGroup>
+						<s:Button label="TIMEOUT" width="105" click="model.actionTeamTimoutStart(TeamsModel.VISITING_TEAM)" enabled="{model.buttonActive_visitorTimeout}" styleName="panelButton" toolTip="{model.teamsModel.visitorTeam.shortName} {model.TOOLTIP_VISITORTIMEOUT}"/>
+						<s:Label styleName="teamScore" id="visitorScore" text="{model.scoring.visitorTeam.score}" 
+								 fontSize="26" fontWeight="bold" width="100%" paddingTop="5" paddingBottom="5" textAlign="center"/>
+						<s:Label width="100%" text="{model.labelJamPointsType}" textAlign="center" styleName="smallText"/>
+						<s:HGroup verticalAlign="middle" paddingBottom="3" enabled="{model.actionActive_modifyJamScore}">
+							<controls:IconButton iconUp="{AssetModel.ICON_ARROWLEFT_CLASS}" toolTip="{model.TOOLTIP_VISITORJAMSCORE_DECREMENT}" styleName="centeredIconButton" width="16"
+												 click="model.actionHandler_adjustCurrentJamScore(-1,TeamsModel.VISITING_TEAM, ScoringModel.INCREMENT)"/> 
+							<s:TextInput id="visitor_pointsThisJam" styleName="scoringTextInput" width="36" maxChars="2" text="{model.scoring.visitorTeam.pointsThisJam}"
+										 focusIn="model.disableKeyboardShortcuts();" 
+										 focusOut="visitor_pointsThisJam_focusOutHandler(event);"
+										 enter="enterHandler(event);"/>
+							<controls:IconButton iconUp="{AssetModel.ICON_ARROWRIGHT_CLASS}" toolTip="{model.TOOLTIP_VISITORJAMSCORE_INCREMENT}" styleName="centeredIconButton" width="16"											 
+												 click="model.actionHandler_adjustCurrentJamScore(1,TeamsModel.VISITING_TEAM, ScoringModel.INCREMENT)"/> 
+						</s:HGroup>
+						<s:HGroup verticalAlign="middle" paddingBottom="3" enabled="{model.actionActive_modifyJamScore}" gap="8">
+							<s:Button label="+4" width="36" click="model.actionHandler_adjustCurrentJamScore(4,TeamsModel.VISITING_TEAM, ScoringModel.INCREMENT)" toolTip="{model.TOOLTIP_VISITORJAMSCORE_INCREMENT4}"/>
+							<s:Button label="+5" width="36" click="model.actionHandler_adjustCurrentJamScore(5,TeamsModel.VISITING_TEAM, ScoringModel.INCREMENT)" toolTip="{model.TOOLTIP_VISITORJAMSCORE_INCREMENT5}"/>
+						</s:HGroup>	
+							
+						<s:Button label="{model.buttonText_visitorLeadJamToggle}" width="105" enabled="{model.buttonActive_visitorLeadJammer}"  
+								  click="model.actionHandler_leadJammer(TeamsModel.VISITING_TEAM)" styleName="panelButton" toolTip="{model.teamsModel.visitorTeam.shortName} {model.TOOLTIP_VISITORLEADJAMMER}"/>
+					</s:VGroup>	
+					
+					<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~ SCORING CORRECTIONS ~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+					<s:VGroup height="100%" width="100%" horizontalAlign="center" paddingTop="3" paddingBottom="5" gap="0" includeIn="corrections"> 
+						<s:Label width="100%" text="{model.teamsModel.visitorTeam.shortName}" styleName="teamName" textAlign="center" maxDisplayedLines="1"/>
+						<s:Label width="100%" text="TIMEOUTS" textAlign="center" paddingTop="10" styleName="smallText"/>
+						<s:HGroup verticalAlign="middle" paddingBottom="8">						
+							<controls:IconButton iconUp="{AssetModel.ICON_ARROWLEFT_CLASS}" toolTip="Decrement Timeouts Remaining" styleName="centeredIconButton" width="16"
+												 click="model.actionTimeoutsLeftChange(-1,TeamsModel.VISITING_TEAM)" /> 
+							<s:TextInput id="visitor_timeoutsCorrection" styleName="scoringTextInput" width="40" text="{model.scoring.visitorTeam.timeoutsLeft}" maxChars="1" restrict="0-9"
+										 focusIn="model.disableKeyboardShortcuts();" 
+										 focusOut="visitor_timeoutsCorrection_focusOutHandler(event);"
+										 enter="enterHandler(event);"/>
+							<controls:IconButton iconUp="{AssetModel.ICON_ARROWRIGHT_CLASS}" toolTip="Increment Timeouts Remaining" styleName="centeredIconButton" width="16"											 
+												 click="model.actionTimeoutsLeftChange(1,TeamsModel.VISITING_TEAM)" /> 
+						</s:HGroup>
+						
+						<s:Label width="100%" text="TOTAL SCORE" textAlign="center" styleName="smallText"/>
+						<s:HGroup verticalAlign="middle" paddingBottom="8">						
+							<controls:IconButton iconUp="{AssetModel.ICON_ARROWLEFT_CLASS}" toolTip="Decrement Total Score" styleName="centeredIconButton" width="16"
+												 click="model.actionTeamScoreChange(-1,TeamsModel.VISITING_TEAM);"/> 
+							<s:TextInput id="visitor_teamScoreCorrection" styleName="scoringTextInput" width="40" text="{model.scoring.visitorTeam.score}" maxChars="3" restrict="0-9"
+										 focusIn="model.disableKeyboardShortcuts();"
+										 focusOut="visitor_teamScoreCorrection_focusOutHandler(event);"
+										 enter="enterHandler(event);"/>
+							<controls:IconButton iconUp="{AssetModel.ICON_ARROWRIGHT_CLASS}" toolTip="Increment Total Score" styleName="centeredIconButton" width="16"											 
+												 click="model.actionTeamScoreChange(1,TeamsModel.VISITING_TEAM);"/> 
+						</s:HGroup>
+						
+						<s:Label width="100%" text="PTS PREV JAM" textAlign="center" styleName="smallText"/>
+						<s:HGroup verticalAlign="middle" paddingBottom="8" enabled="{model.firstJamEnded}">
+							<controls:IconButton iconUp="{AssetModel.ICON_ARROWLEFT_CLASS}" toolTip="Decrement Previous Jam Points" styleName="centeredIconButton" width="16"
+												 click="model.actionPreviousJamScoreChange(-1,TeamsModel.VISITING_TEAM);"/> 
+							<s:TextInput id="visitor_previousJamPtsCorrection" styleName="scoringTextInput" width="40" text="{model.scoring.visitorTeam.pointsPreviousJam}" maxChars="2" restrict="0-9"
+										 focusIn="model.disableKeyboardShortcuts();" 
+										 focusOut="visitor_previousJamPtsCorrection_focusOutHandler(event);"
+										 enter="enterHandler(event);"/>
+							<controls:IconButton iconUp="{AssetModel.ICON_ARROWRIGHT_CLASS}" toolTip="Increment Previous Jam Points" styleName="centeredIconButton" width="16"											 
+												 click="model.actionPreviousJamScoreChange(1,TeamsModel.VISITING_TEAM);"/> 
+						</s:HGroup>
+						
+						<s:Label width="100%" text="TOTAL JAMS LEAD" textAlign="center" styleName="smallText"/>
+						<s:HGroup verticalAlign="middle" paddingBottom="8">
+							<controls:IconButton iconUp="{AssetModel.ICON_ARROWLEFT_CLASS}" toolTip="Decrement Total Jams Lead" styleName="centeredIconButton" width="16"
+												 click="model.actionTotalJamsLeadChange(-1,TeamsModel.VISITING_TEAM);"/> 
+							<s:TextInput id="visitor_totalJamsLeadCorrection" styleName="scoringTextInput" width="40" text="{model.scoring.visitorTeam.jamsLead}" maxChars="2" restrict="0-9"
+										 focusIn="model.disableKeyboardShortcuts();" 
+										 focusOut="visitor_totalJamsLeadCorrection_focusOutHandler(event);"
+										 enter="enterHandler(event);"/>
+							<controls:IconButton iconUp="{AssetModel.ICON_ARROWRIGHT_CLASS}" toolTip="Increment Total Jams Lead" styleName="centeredIconButton" width="16"											 
+												 click="model.actionTotalJamsLeadChange(1,TeamsModel.VISITING_TEAM);"/> 
+						</s:HGroup>
+					</s:VGroup>					
+				</s:BorderContainer>
+			</s:HGroup>
+				
+			<mx:HRule strokeWidth="2" strokeColor="0x222222" shadowColor="0x515151" width="100%" />
+				
+			<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ BUTTON BAR ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+			<s:HGroup width="100%" gap="0" paddingBottom="9" horizontalAlign="center" includeIn="scoring">
+				<s:VGroup horizontalAlign="center" gap="3" width="114">
+					<s:Button id="breakTogglebutton" width="105" label="{model.buttonText_breakStartToggle}" enabled="{model.buttonActive_breakStartToggle}" visible="{model.buttonVisible_breakStartToggle}" click="model.startBreak_clickHandler()" styleName="panelButton" toolTip="{model.TOOLTIP_STARTBREAK}"/>
+				</s:VGroup>
+				<s:VGroup horizontalAlign="center" gap="0" width="176">
+					<s:VGroup horizontalAlign="center" gap="3" width="120">
+						<s:Button label="{model.buttonText_primaryActionToggle}" width="140" click="model.actionHandler_primaryAction()" enabled="{model.buttonActive_primaryActionToggle}" styleName="panelButton" toolTip="{model.buttonTooltip_primaryActionToggle}" />
+					</s:VGroup>
+				</s:VGroup>
+				<s:VGroup horizontalAlign="center" gap="3" width="114">
+					<s:Button label="{model.buttonText_intermissionToggle}" click="model.intermission_clickHandler();" enabled="{model.buttonActive_intermission}" width="105" styleName="panelButton" toolTip="{model.buttonToooltip_intermission}"/>
+				</s:VGroup>
+			</s:HGroup>
+			
+			<s:HGroup width="100%" gap="0" paddingBottom="9" horizontalAlign="center" includeIn="corrections">
+				<s:VGroup horizontalAlign="center" gap="3" width="114">
+					<s:Button label="NEXT PERIOD" width="105" click="model.confirmPrepareNextPeriod();"  styleName="panelButton" toolTip="Proceed to Next Period" />
+				</s:VGroup>
+				<s:VGroup horizontalAlign="center" gap="0" width="176">
+				</s:VGroup>
+				<s:VGroup horizontalAlign="center" gap="3" width="114">
+					<s:Button label="NEW GAME" click="model.confirmScoreboardReset();"  width="105" styleName="panelButton" toolTip="Reset the Scoreboard for a New Game"/>
+				</s:VGroup>
+			</s:HGroup>
+		</s:VGroup>
+	</s:BorderContainer>	
+
+
+</s:Group>

@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 xmlns:controls="com.rollerderbyproductions.jamtracker.controls.*"
+		 creationComplete="model.init();">
+
+	<fx:Script>
+		<![CDATA[
+			import com.rollerderbyproductions.jamtracker.model.ApplicationModel;
+			import com.rollerderbyproductions.jamtracker.model.AssetModel;
+			import com.rollerderbyproductions.jamtracker.presentation.MainPresentationModel;
+			import com.rollerderbyproductions.jamtracker.presentation.input.ScoreboardConfigPresentationModel;
+			import com.rollerderbyproductions.jamtracker.presentation.input.ViewControlPresentationModel;
+			
+			import mx.controls.Alert;
+			import mx.core.Application;
+			
+			[Bindable][Inject] public var model:ScoreboardConfigPresentationModel;
+			[Bindable][Inject] public var main:MainPresentationModel;
+			[Inject] public var viewControl:ViewControlPresentationModel;
+
+
+			protected function displayJammerImage_clickHandler(event:MouseEvent):void
+			{
+				if (displayJammerImage_Checkbox.selected){
+					displayDefaultImage_Checkbox.enabled = true;					
+				} else {
+					displayDefaultImage_Checkbox.selected = false;
+					displayDefaultImage_Checkbox.enabled = false;
+					model.scoreboard.useDefaultJammerImage = false;
+				}
+				model.updateLeadJammerIndicators(event);
+			}
+
+		]]>
+	</fx:Script>
+	
+	<s:VGroup width="100%" horizontalAlign="center">
+		
+		<s:HGroup height="100%" width="100%">
+		
+			<s:BorderContainer styleName="panelContainer" width="100%" height="100%">
+				<s:VGroup paddingTop="10" paddingLeft="5" paddingRight="5" width="100%">
+					<s:VGroup paddingLeft="5" paddingRight="5" width="100%">						
+						<s:HGroup width="100%">
+							<s:CheckBox click="model.updateLeadJammerInformation(event)" selected="@{model.scoreboard.displayJammerName}"/>
+							<s:Label text="Display the names of the selected jammers" styleName="checkboxLabel" width="100%"/>	
+						</s:HGroup>
+						<s:HGroup width="100%">
+							<s:CheckBox id="displayJammerImage_Checkbox" click="displayJammerImage_clickHandler(event)" selected="@{model.scoreboard.displayJammerImage}"/>
+							<s:Label text="Display an image for the selected jammers" styleName="checkboxLabel" width="100%"/>	
+						</s:HGroup>
+						<s:HGroup width="100%" paddingBottom="6">
+							<s:CheckBox id="displayDefaultImage_Checkbox" click="model.updateLeadJammerInformation(event)" selected="@{model.scoreboard.useDefaultJammerImage}"/>
+							<s:Label text="Use the Default Jammer Image when one is not available for a selected jammer." styleName="checkboxLabel" width="100%"/>	
+						</s:HGroup>
+						<s:HGroup width="100%" horizontalAlign="left">
+							<s:CheckBox selected="@{model.scoreboard.autoMinimizeJammerInfo}" id="debugCheckbox"/>
+							<s:Label text="Auto minimize jammer images when a Jam ends, restore when next jame starts" styleName="checkboxLabel" width="100%"/>
+						</s:HGroup>
+
+						<s:HGroup width="100%">
+							<s:Label text="Jammer Image Height:" verticalAlign="middle" height="100%" paddingRight="7"/>
+							<mx:HSlider minimum="0" maximum="{ApplicationModel.HEIGHT_OF_IMAGE_AND_LOGO}" tickInterval="39" liveDragging="true" 
+										change="model.changeJammerImageHeight(event)" width="170" value="{model.scoreboard.setJammerImageHeight}" />
+							<controls:IconToggleButton iconUp="{AssetModel.ICON_GIRL16_CLASS}" 
+													   iconDown="{AssetModel.ICON_GIRLINACTIVE16_CLASS}" 
+													   toolTip="Toggle Jammer Image Visibility" 
+													   styleName="centeredIconToggleButton" 
+													   selected="{model.scoreboard.hideJammerImageArea}"
+													   enabled="{model.scoreboard.setJammerImageHeight > 0}"
+													   click="{viewControl.toggleJammerImage_ClickHandler(event)}" width="22"/>
+
+						</s:HGroup>
+					</s:VGroup>
+
+					<mx:HRule strokeWidth="2" strokeColor="0x222222" shadowColor="0x515151" width="100%" />
+
+					<s:VGroup paddingLeft="5" paddingRight="5" width="100%">						
+						<s:Label text="For jammers using the image border, the color of the border is configured as follows:" paddingTop="6" paddingBottom="10" width="100%" />						
+						<s:HGroup width="100%">
+							<s:Label text="Jammer Image Border Color:" verticalAlign="middle" height="100%" paddingLeft="27"/>
+							<mx:ColorPicker change="model.updateLeadJammerInformation(event)" selectedColor="@{model.scoreboard.jammerImageBorderColor}"/>
+						</s:HGroup>
+						<s:HGroup width="100%">
+							<s:Label text="Lead Jammer Border Color:" verticalAlign="middle" height="100%" paddingLeft="27" paddingRight="7"/>
+							<mx:ColorPicker change="model.updateLeadJammerInformation(event)" selectedColor="@{model.scoreboard.jammerImageLeadBorderColor}" />
+						</s:HGroup>
+					</s:VGroup>
+				</s:VGroup>
+			</s:BorderContainer>
+			
+			<s:BorderContainer styleName="panelContainer" width="180" height="450">
+				<s:VGroup width="100%" paddingLeft="5" horizontalAlign="center" verticalAlign="top" paddingTop="5" paddingRight="5">
+					<s:VGroup height="100%" horizontalAlign="center" paddingBottom="3">
+						<s:Label text="Home Default Jammer Image"/>
+						<s:HGroup paddingLeft="22">
+							<s:BorderContainer styleName="transparancyBorderContainer" width="97" height="73">
+								<mx:Image source="{model.scoreboard.homeDefaultJammerImage.data}" width="100%" height="100%" 
+										  scaleContent="true"
+										  horizontalAlign="center"
+										  verticalAlign="middle"/>
+							</s:BorderContainer>
+							<mx:Image source="{AssetModel.ICON_WARNING_CLASS}" visible="{model.displayHomeDefaultImageSizeWarning}" height="100%" verticalAlign="bottom"
+									  toolTip="{ApplicationModel.MESSAGE_DEFAULTJAMMERIMAGE_IMAGE_EXCEED_MAX_SIZE}" />
+						</s:HGroup>
+						<controls:IconButton label="{model.defaultJammerImageUploadText}" width="120"
+											 iconUp="{AssetModel.ICON_ADDIMAGE16_CLASS}"
+											 click="model.scoreboardImageUpload(model.IMAGE_HOME_DEFAULT_JAMMER_IMG)" 
+											 toolTip="Update Default Jammer Image"
+											 styleName="iconButton" />
+					</s:VGroup>
+					<mx:HRule strokeWidth="2" strokeColor="0x222222" shadowColor="0x515151" width="100%" />
+					<s:VGroup height="100%" horizontalAlign="center" paddingBottom="3">
+						
+						
+						<s:Label text="Visitor Default Jammer Image"/>
+						<s:HGroup paddingLeft="22">
+							<s:BorderContainer styleName="transparancyBorderContainer" width="97" height="73">
+								<mx:Image source="{model.scoreboard.visitorDefaultJammerImage.data}" width="100%" height="100%" 
+										  scaleContent="true"
+										  horizontalAlign="center"
+										  verticalAlign="middle"/>
+							</s:BorderContainer>
+							<mx:Image source="{AssetModel.ICON_WARNING_CLASS}" visible="{model.displayVisitorDefaultImageSizeWarning}" height="100%" verticalAlign="bottom"
+									  toolTip="{ApplicationModel.MESSAGE_DEFAULTJAMMERIMAGE_IMAGE_EXCEED_MAX_SIZE}" />
+						</s:HGroup>
+						<controls:IconButton label="{model.defaultJammerImageUploadText}" width="120"
+											 iconUp="{AssetModel.ICON_ADDIMAGE16_CLASS}"
+											 click="model.scoreboardImageUpload(model.IMAGE_VISITOR_DEFAULT_JAMMER_IMG)" 
+											 toolTip="Update Default Jammer Image"
+											 styleName="iconButton" />
+					</s:VGroup>
+					<mx:HRule strokeWidth="2" strokeColor="0x222222" shadowColor="0x515151" width="100%" />
+					<s:VGroup height="100%" horizontalAlign="center" paddingTop="3">
+						<s:Label text="Lead Jammer Indicator"/>
+						<s:HGroup paddingLeft="22">
+							<s:BorderContainer styleName="transparancyBorderContainer" width="97" height="73">
+								<mx:Image source="{model.scoreboard.leadJammerIndicatorImage.data}" width="100%" height="100%" 
+										  scaleContent="true"
+										  horizontalAlign="center"
+										  smoothBitmapContent="true"
+										  verticalAlign="middle"/>
+							</s:BorderContainer>
+							<mx:Image source="{AssetModel.ICON_WARNING_CLASS}" visible="{model.displayLeadIndicatorImageSizeWarning}" height="100%" verticalAlign="bottom"
+									  toolTip="{ApplicationModel.MESSAGE_LEADINDICATOR_IMAGE_EXCEED_MAX_SIZE}" />
+						</s:HGroup>
+						<controls:IconButton label="{model.leadJammerIndicatorImageUploadText}" width="120"
+											 iconUp="{AssetModel.ICON_ADDIMAGE16_CLASS}"
+											 click="model.scoreboardImageUpload(model.IMAGE_LEAD_JAMMER_INDICATOR)" 
+											 toolTip="Update Default Jammer Image"
+											 styleName="iconButton" />
+					</s:VGroup>
+				</s:VGroup>
+			</s:BorderContainer>
+		</s:HGroup>
+
+	</s:VGroup>
+	
+</s:Group>

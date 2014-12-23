@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:SkinnableContainer  xmlns:fx="http://ns.adobe.com/mxml/2009"
+					   xmlns:controls="com.rollerderbyproductions.jamtracker.controls.*"
+					   xmlns:s="library://ns.adobe.com/flex/spark" 
+					   xmlns:mx="library://ns.adobe.com/flex/mx"
+					   xmlns:scoreboard="com.rollerderbyproductions.jamtracker.views.scoreboard.*"
+					   backgroundColor="0x000000"
+					   minWidth="1024" minHeight="768"
+					   maxWidth="1024" maxHeight="768">
+	
+	
+	<fx:Script>
+		<![CDATA[
+			import com.rollerderbyproductions.jamtracker.events.ScoreboardEvent;
+						
+			import mx.controls.Alert;
+			import mx.logging.ILogger;
+			import mx.logging.Log;
+			
+			private static const _LOG:ILogger = Log.getLogger("PreviewScoreboard");
+
+			[EventHandler( event="ScoreboardEvent.VIEW_CUSTOM_PREVIEW" )]
+			public function setViewStateCustom(event:ScoreboardEvent):void {
+				_LOG.debug("Handle VIEW_CUSTOM_PREVIEW ["+event.viewName+"]");
+				previewScoreboard.currentState = event.viewName;
+			}
+			
+			[EventHandler( event="ScoreboardEvent.VIEW_MAIN_PREVIEW" )]
+			public function setViewStateMain():void {
+				_LOG.debug("Handle VIEW_MAIN_PREVIEW");
+				previewScoreboard.currentState = "mainScoreboard";
+			}
+
+			
+		]]>
+	</fx:Script>
+		
+	<scoreboard:ScoreboardStateManager id="previewScoreboard" />
+
+	
+</s:SkinnableContainer>
