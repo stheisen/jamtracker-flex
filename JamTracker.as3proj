@@ -8,11 +8,11 @@
     <movie fps="30" />
     <movie width="800" />
     <movie height="600" />
-    <movie version="3" />
-    <movie minorVersion="4" />
+    <movie version="15" />
+    <movie minorVersion="0" />
     <movie platform="AIR" />
     <movie background="#FFFFFF" />
-    <movie preferredSDK="Apache Flex 4.13.0 FP15.0 AIR15.0 en_US;4.13.0;" />
+    <movie preferredSDK="Flex 4.6.0, AIR 28.0;4.6.0, 28.0;" />
   </output>
   <!-- Other classes to be compiled into your SWF -->
   <classpaths>
@@ -43,7 +43,7 @@
     <option linkReport="" />
     <option loadExterns="" />
     <option staticLinkRSL="True" />
-    <option additional="" />
+    <option additional="-swf-version=15" />
     <option compilerConstants="" />
     <option minorVersion="" />
   </build>
