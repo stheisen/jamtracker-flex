@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<application xmlns="http://ns.adobe.com/air/application/15.0">
+<application xmlns="http://ns.adobe.com/air/application/30.0">
   <id>JamTracker</id>
-  <versionNumber>0.5.1</versionNumber>
+  <versionNumber>0.6.0</versionNumber>
   <filename>JamTracker</filename>
   <name>JamTracker</name>
   <description>The best in RollerDerby scorekeeping</description>

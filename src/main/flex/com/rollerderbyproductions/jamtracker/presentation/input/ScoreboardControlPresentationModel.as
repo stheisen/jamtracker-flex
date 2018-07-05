@@ -276,6 +276,7 @@ package com.rollerderbyproductions.jamtracker.presentation.input
 					// if this is not a jam or official JAM timeout, then we can update the previous jam points as well
 					if ((_currentState != STATE_JAM) && (_currentState != STATE_OFFICALTIMEOUT_JAM))
 						scoring.homeTeam.pointsPreviousJam = scoring.homeTeam.pointsThisJam;
+					break;
 				case TeamsModel.VISITING_TEAM:
 					if (adjType == ScoringModel.SET){
 						_LOG.debug("Set the visitor points This jam ["+scoring.visitorTeam.score+"] score to: [" + adjValue +"]");
@@ -302,6 +303,7 @@ package com.rollerderbyproductions.jamtracker.presentation.input
 					// if this is not a jam or official JAM timeout, then we can update the previous jam points as well
 					if ((_currentState != STATE_JAM) && (_currentState != STATE_OFFICALTIMEOUT_JAM))
 						scoring.visitorTeam.pointsPreviousJam = scoring.visitorTeam.pointsThisJam;
+					break;
 			}
 			// If the game is over, then check for overtime conditions
 			if ((_currentState == STATE_ENDGAME) || (_currentState == STATE_OVERTIMEPREPARE)){
