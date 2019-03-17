@@ -2,7 +2,7 @@
 
 :: Path to Flex SDK
 :: set FLEX_SDK=C:\Apache\Flex
-set FLEX_SDK=D:\Programs\apache-flex-sdk-4.16.1
+set FLEX_SDK=C:\LocalData\Programs\ApacheFlex_4.16.1
 
 :validation
 if not exist "%FLEX_SDK%\bin" goto flexsdk

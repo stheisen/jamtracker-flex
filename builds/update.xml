@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <update xmlns="http://ns.adobe.com/air/framework/update/description/2.5">
 	<versionNumber>0.6.0</versionNumber>
-	<url>http://www.rollerderbyproductions.com/dist/jamtracker/JamTracker_v0.6.0.air</url>
+	<url>http://www.rollerderbyproductions.com/dist/jamtracker/JamTracker_v0.6.1.air</url>
 	<description>
-		** AN EXPIRED CERTIFICATE ERROR HAS PREVENTED THE AUTO-UPDATE FEATURE **
-		In order to enjoy the latest version you must manually uninstall Jamtracker and download the newest version from http://www.rollerderbyproductions.com
+		Replaced the +4 and +5 scoring buttons with +3 and +4 respectively.
 	</description>
 </update>

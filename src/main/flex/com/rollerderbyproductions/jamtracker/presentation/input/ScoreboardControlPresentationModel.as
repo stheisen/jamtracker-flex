@@ -85,8 +85,8 @@ package com.rollerderbyproductions.jamtracker.presentation.input
 		public const TOOLTIP_HOMETIMEOUT:String = "Timeout (C)";
 		public const TOOLTIP_HOMEJAMSCORE_INCREMENT:String = "Increment Jam Score (Q)";
 		public const TOOLTIP_HOMEJAMSCORE_DECREMENT:String = "Decrement Jam Score (W)";
-		public const TOOLTIP_HOMEJAMSCORE_INCREMENT4:String = "Increment Jam Score by 4 (A)";
-		public const TOOLTIP_HOMEJAMSCORE_INCREMENT5:String = "Increment Jam Score by 5 (S)";
+		public const TOOLTIP_HOMEJAMSCORE_INCREMENT3:String = "Increment Jam Score by 3 (A)";
+		public const TOOLTIP_HOMEJAMSCORE_INCREMENT4:String = "Increment Jam Score by 4 (S)";
 		public const TOOLTIP_HOMELEADJAMMER:String = "Lead Jammer (G)";
 		public const TOOLTIP_INTERMISSION:String = "Start Intermission Clock";
 		public const TOOLTIP_INTERMISSIONEND:String = "Pause Intermission Clock";
@@ -101,8 +101,8 @@ package com.rollerderbyproductions.jamtracker.presentation.input
 		public const TOOLTIP_VISITORTIMEOUT:String = "Timeout (,)";
 		public const TOOLTIP_VISITORJAMSCORE_INCREMENT:String = "Increment Jam Score (])";
 		public const TOOLTIP_VISITORJAMSCORE_DECREMENT:String = "Decrement Jam Score ([)";
-		public const TOOLTIP_VISITORJAMSCORE_INCREMENT4:String = "Increment Jam Score by 4 (;)";
-		public const TOOLTIP_VISITORJAMSCORE_INCREMENT5:String = "Increment Jam Score by 5 (\')";
+		public const TOOLTIP_VISITORJAMSCORE_INCREMENT3:String = "Increment Jam Score by 3 (;)";
+		public const TOOLTIP_VISITORJAMSCORE_INCREMENT4:String = "Increment Jam Score by 4 (\')";
 		public const TOOLTIP_VISITORLEADJAMMER:String = "Lead Jammer (J)";
 		
 		private const STATE_NEWPERIOD:String = "NEW PERIOD";
@@ -1549,12 +1549,12 @@ package com.rollerderbyproductions.jamtracker.presentation.input
 						if (actionActive_modifyJamScore) actionHandler_adjustCurrentJamScore(-1,TeamsModel.HOME_TEAM, ScoringModel.INCREMENT);
 						keyTrapped = 'W'; 
 						break;
-					case 83: // Increase Home Score by 5
-						if (actionActive_modifyJamScore) actionHandler_adjustCurrentJamScore(5,TeamsModel.HOME_TEAM, ScoringModel.INCREMENT);
+					case 83: // Increase Home Score by 4
+						if (actionActive_modifyJamScore) actionHandler_adjustCurrentJamScore(4,TeamsModel.HOME_TEAM, ScoringModel.INCREMENT);
 						keyTrapped = 'S'; 
 						break;
-					case 65: // Increase Home Score by 4
-						if (actionActive_modifyJamScore) actionHandler_adjustCurrentJamScore(4,TeamsModel.HOME_TEAM, ScoringModel.INCREMENT);
+					case 65: // Increase Home Score by 3
+						if (actionActive_modifyJamScore) actionHandler_adjustCurrentJamScore(3,TeamsModel.HOME_TEAM, ScoringModel.INCREMENT);
 						keyTrapped = 'A'; 
 						break;
 
@@ -1566,12 +1566,12 @@ package com.rollerderbyproductions.jamtracker.presentation.input
 						if (actionActive_modifyJamScore) actionHandler_adjustCurrentJamScore(1,TeamsModel.VISITING_TEAM, ScoringModel.INCREMENT);
 						keyTrapped = ']'; 
 						break;
-					case 222: // Increase Visitor Score by 5
-						if (actionActive_modifyJamScore) actionHandler_adjustCurrentJamScore(5,TeamsModel.VISITING_TEAM, ScoringModel.INCREMENT);
+					case 222: // Increase Visitor Score by 4
+						if (actionActive_modifyJamScore) actionHandler_adjustCurrentJamScore(4,TeamsModel.VISITING_TEAM, ScoringModel.INCREMENT);
 						keyTrapped = '\''; 
 						break;
-					case 186: // Increase Visitor Score by 4
-						if (actionActive_modifyJamScore) actionHandler_adjustCurrentJamScore(4,TeamsModel.VISITING_TEAM, ScoringModel.INCREMENT);
+					case 186: // Increase Visitor Score by 3
+						if (actionActive_modifyJamScore) actionHandler_adjustCurrentJamScore(3,TeamsModel.VISITING_TEAM, ScoringModel.INCREMENT);
 						keyTrapped = ';'; 
 						break;
 /*

@@ -1,5 +1,7 @@
 AIR for desktop instructions
 
+Install Apace FLEX will all options enabled, otherwise embedded fonts will give you issues
+
 1. Configuration
 
 	- edit 'bat\SetupSDK.bat' for the path to Flex SDK

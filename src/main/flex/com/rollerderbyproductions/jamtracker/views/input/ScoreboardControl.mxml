@@ -234,8 +234,8 @@
 												 click="model.actionHandler_adjustCurrentJamScore(1,TeamsModel.HOME_TEAM, ScoringModel.INCREMENT)"/> 
 						</s:HGroup>
 						<s:HGroup verticalAlign="middle" paddingBottom="3" enabled="{model.actionActive_modifyJamScore}" gap="8">
+							<s:Button label="+3" width="36" click="model.actionHandler_adjustCurrentJamScore(3,TeamsModel.HOME_TEAM, ScoringModel.INCREMENT)" toolTip="{model.TOOLTIP_HOMEJAMSCORE_INCREMENT3}"/>
 							<s:Button label="+4" width="36" click="model.actionHandler_adjustCurrentJamScore(4,TeamsModel.HOME_TEAM, ScoringModel.INCREMENT)" toolTip="{model.TOOLTIP_HOMEJAMSCORE_INCREMENT4}"/>
-							<s:Button label="+5" width="36" click="model.actionHandler_adjustCurrentJamScore(5,TeamsModel.HOME_TEAM, ScoringModel.INCREMENT)" toolTip="{model.TOOLTIP_HOMEJAMSCORE_INCREMENT5}"/>
 						</s:HGroup>	
 						<s:Button label="{model.buttonText_homeLeadJamToggle}" width="105" enabled="{model.buttonActive_homeLeadJammer}" 
 								  styleName="panelButton" click="model.actionHandler_leadJammer(TeamsModel.HOME_TEAM)" toolTip="{model.teamsModel.homeTeam.shortName} {model.TOOLTIP_HOMELEADJAMMER}"/>
@@ -399,8 +399,8 @@
 												 click="model.actionHandler_adjustCurrentJamScore(1,TeamsModel.VISITING_TEAM, ScoringModel.INCREMENT)"/> 
 						</s:HGroup>
 						<s:HGroup verticalAlign="middle" paddingBottom="3" enabled="{model.actionActive_modifyJamScore}" gap="8">
+							<s:Button label="+3" width="36" click="model.actionHandler_adjustCurrentJamScore(3,TeamsModel.VISITING_TEAM, ScoringModel.INCREMENT)" toolTip="{model.TOOLTIP_VISITORJAMSCORE_INCREMENT3}"/>
 							<s:Button label="+4" width="36" click="model.actionHandler_adjustCurrentJamScore(4,TeamsModel.VISITING_TEAM, ScoringModel.INCREMENT)" toolTip="{model.TOOLTIP_VISITORJAMSCORE_INCREMENT4}"/>
-							<s:Button label="+5" width="36" click="model.actionHandler_adjustCurrentJamScore(5,TeamsModel.VISITING_TEAM, ScoringModel.INCREMENT)" toolTip="{model.TOOLTIP_VISITORJAMSCORE_INCREMENT5}"/>
 						</s:HGroup>	
 							
 						<s:Button label="{model.buttonText_visitorLeadJamToggle}" width="105" enabled="{model.buttonActive_visitorLeadJammer}"  
