@@ -37,7 +37,7 @@
 			public var LOGO_PAYPALDONATE_CLASS:Class;
 			
 			[Bindable] public var copyright:String="\u00A9";
-			[Bindable] public var payPalURL:URLRequest= new URLRequest("https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=6GGB6LCXWBK9N");
+			[Bindable] public var payPalURL:URLRequest= new URLRequest("https://paypal.me/sdtheisen?locale.x=en_US");
 			
 			/**
 			 * Handles the close form event
