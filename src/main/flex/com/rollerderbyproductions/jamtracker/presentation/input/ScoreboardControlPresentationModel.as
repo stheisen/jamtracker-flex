@@ -444,6 +444,7 @@ package com.rollerderbyproductions.jamtracker.presentation.input
 					break;
 				case STATE_HOMETIMEOUT:
 				case STATE_VISITORTIMEOUT:
+				case STATE_TIMEOUTEXPIRED:
 					setCurrentState(STATE_OFFICALTIMEOUT_BREAK);
 					// Stop, hide and reset the timeout clock
 					scoring.timeoutClock.stop(true,true);

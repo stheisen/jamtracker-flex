@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <update xmlns="http://ns.adobe.com/air/framework/update/description/2.5">
-	<versionNumber>0.6.1</versionNumber>
+	<versionNumber>0.6.2</versionNumber>
 	<url>http://www.rollerderbyproductions.com/dist/jamtracker/JamTracker_v0.6.1.air</url>
 	<description>
-		Replaced the +4 and +5 scoring buttons with +3 and +4 respectively.
+		Fixed a display issue with the clock when a team timeout expires, followed by an official timeout.
 	</description>
 </update>
